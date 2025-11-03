@@ -14,15 +14,15 @@ const routes = [
       title: '人生拼图 - 首页'
     }
   },
-  // 这里可以添加其他路由，比如登录、注册等页面
-  // {
-  //   path: '/login',
-  //   name: 'Login',
-  //   component: () => import('../views/Login.vue'),
-  //   meta: {
-  //     title: '登录'
-  //   }
-  // },
+  // 登录页面路由
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/Login.vue'),
+    meta: {
+      title: '登录'
+    }
+  },
   {
     path: '/register',
     name: 'Register',
