@@ -38,9 +38,7 @@ public class LifeUserImpl implements LifeUserInterface {
         }
         
         // 检查用户名是否已存在
-        QueryWrapper<LifeUser> usernameWrapper = new QueryWrapper<>();
-        usernameWrapper.eq("username", qo.getUsername());
-        if (lifeUserMapper.selectOne(usernameWrapper) != null) {
+        if (findByUsername(qo.getUsername()) != null) {
             return 0; // 用户名已存在
         }
         
@@ -110,9 +108,7 @@ public class LifeUserImpl implements LifeUserInterface {
     @Override
     public boolean changePassword(ChangePasswordQo changePasswordQo) {
         // 根据用户名查询用户
-        QueryWrapper<LifeUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", changePasswordQo.getUsername());
-        LifeUser user = lifeUserMapper.selectOne(queryWrapper);
+        LifeUser user = findByUsername(changePasswordQo.getUsername());
         
         // 如果用户不存在，返回false
         if (user == null) {
@@ -135,7 +131,7 @@ public class LifeUserImpl implements LifeUserInterface {
         // 返回更新是否成功
         return result > 0;
     }
-    
+
     @Override
     public boolean updateUser(UpdateUserQo updateUserQo) {
         // 根据用户ID查询用户
@@ -148,9 +144,7 @@ public class LifeUserImpl implements LifeUserInterface {
         
         // 检查用户名是否重复（如果用户名变更了）
         if (!user.getUsername().equals(updateUserQo.getUsername())) {
-            QueryWrapper<LifeUser> usernameWrapper = new QueryWrapper<>();
-            usernameWrapper.eq("username", updateUserQo.getUsername());
-            LifeUser existingUser = lifeUserMapper.selectOne(usernameWrapper);
+            LifeUser existingUser = findByUsername(updateUserQo.getUsername());
             if (existingUser != null) {
                 // 用户名已存在，返回false
                 return false;
@@ -182,5 +176,51 @@ public class LifeUserImpl implements LifeUserInterface {
         
         // 返回更新是否成功
         return result > 0;
+    }
+    
+    @Transactional
+    @Override
+    public String verifyEmail(String token) {
+        // 根据令牌查找用户
+        QueryWrapper<LifeUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("verification_token", token);
+        LifeUser user = lifeUserMapper.selectOne(wrapper);
+        
+        if (user == null) {
+            logger.warn("无效的验证令牌: {}", token);
+            throw new RuntimeException("无效的验证链接，请重新注册");
+        }
+        
+        if (user.getEmailVerified()) {
+            logger.info("邮箱 {} 已经验证过", user.getEmail());
+            return "邮箱已经验证过";
+        }
+        
+        // 更新用户状态为已验证
+        user.setEmailVerified(true);
+        user.setVerificationToken(null); // 验证后清除令牌
+        lifeUserMapper.updateById(user);
+        
+        logger.info("用户 {} 的邮箱 {} 验证成功", user.getUsername(), user.getEmail());
+        return "邮箱验证成功，您现在可以登录了";
+    }
+    
+    @Override
+    public LifeUser findByUsername(String username) {
+        QueryWrapper<LifeUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", username);
+        return lifeUserMapper.selectOne(wrapper);
+    }
+    
+    @Override
+    public LifeUser findByEmail(String email) {
+        QueryWrapper<LifeUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", email);
+        return lifeUserMapper.selectOne(wrapper);
+    }
+    
+    @Override
+    public LifeUser findById(Long id) {
+        return lifeUserMapper.selectById(id);
     }
 }

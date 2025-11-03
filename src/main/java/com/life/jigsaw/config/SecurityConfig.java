@@ -3,7 +3,7 @@ package com.life.jigsaw.config;
 import com.life.jigsaw.common.utils.JwtUtils;
 import com.life.jigsaw.domain.LifeUser;
 import com.life.jigsaw.mapper.LifeUserMapper;
-import io.jsonwebtoken.Claims;
+import com.life.jigsaw.service.LifeUserInterface;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +23,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import static com.life.jigsaw.config.ApiConfig.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +46,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable) // 禁用CSRF保护
             .authorizeHttpRequests(authorize -> authorize
                 // 允许公开访问的接口
-                .requestMatchers("/user/login", "/user/add", "/user/sendEmailCode", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers(PUBLIC_PATH_LOGIN, PUBLIC_PATH_ADD_USER, PUBLIC_PATH_SEND_EMAIL_CODE, SWAGGER_PATH, SWAGGER_API_DOCS_PATH).permitAll()
                 // 其他接口需要认证
                 .anyRequest().authenticated()
             )
@@ -61,7 +63,7 @@ public class SecurityConfig {
     public static class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         @Resource
-        private LifeUserMapper lifeUserMapper;
+        private LifeUserInterface lifeUserService;
 
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -79,7 +81,7 @@ public class SecurityConfig {
                         Long userId = JwtUtils.getUserIdFromToken(token);
                         
                         // 从数据库中获取用户信息
-                        LifeUser user = lifeUserMapper.selectById(userId);
+                        LifeUser user = lifeUserService.findById(userId);
                         if (user != null) {
                             // 创建认证对象
                             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -106,12 +108,11 @@ public class SecurityConfig {
     public static class JwtUserDetailsService implements UserDetailsService {
 
         @Resource
-        private LifeUserMapper lifeUserMapper;
+        private LifeUserInterface lifeUserService;
 
         @Override
         public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            LifeUser user = lifeUserMapper.selectOne(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<LifeUser>()
-                    .eq("username", username));
+            LifeUser user = lifeUserService.findByUsername(username);
             
             if (user == null) {
                 throw new UsernameNotFoundException("User not found with username: " + username);

@@ -1,6 +1,5 @@
 package com.life.jigsaw.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.life.jigsaw.common.response.Response;
 import com.life.jigsaw.common.utils.JwtUtils;
 import com.life.jigsaw.controller.req.lifeuser.AddUserQo;
@@ -8,15 +7,11 @@ import com.life.jigsaw.controller.req.lifeuser.LoginQo;
 import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
 import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
-import com.life.jigsaw.mapper.LifeUserMapper;
 import com.life.jigsaw.service.LifeUserInterface;
 import com.life.jigsaw.service.EmailVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
@@ -38,9 +33,6 @@ public class LifeUserController {
     private LifeUserInterface service;
     
     @Resource
-    private LifeUserMapper lifeUserMapper;
-    
-    @Resource
     private EmailVerificationService emailVerificationService;
 
     /**
@@ -48,7 +40,21 @@ public class LifeUserController {
      */
     @Operation(summary = "发送邮箱验证码")
     @PostMapping("/user/sendEmailCode")
-    Response<String> sendEmailCode(@RequestParam @NotBlank(message = "邮箱不能为空") @Email(message = "邮箱格式不正确") String email){
+    Response<String> sendEmailCode(@RequestBody Map<String, String> requestBody){
+        String email = requestBody.get("email");
+        if (email == null || email.trim().isEmpty()) {
+            return Response.error("邮箱不能为空");
+        }
+        if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            return Response.error("邮箱格式不正确");
+        }
+        
+        // 校验邮箱是否已注册
+        LifeUser existingUser = service.findByEmail(email);
+        if (existingUser != null) {
+            return Response.error("该邮箱已被注册");
+        }
+        
         try {
             emailVerificationService.sendVerificationCode(email);
             return Response.success("验证码已发送，请查收邮件");
@@ -68,8 +74,7 @@ public class LifeUserController {
             Integer result = service.addUser(qo);
             if (result > 0) {
                 // 查询新注册的用户信息
-                LifeUser user = lifeUserMapper.selectOne(new QueryWrapper<LifeUser>()
-                        .eq("username", qo.getUsername()));
+                LifeUser user = service.findByUsername(qo.getUsername());
                 
                 // 生成JWT token
                 String token = JwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName());
@@ -96,28 +101,11 @@ public class LifeUserController {
     @GetMapping("/user/verify-email")
     Response<String> verifyEmail(@RequestParam String token) {
         try {
-            // 根据令牌查找用户
-            QueryWrapper<LifeUser> wrapper = new QueryWrapper<>();
-            wrapper.eq("verification_token", token);
-            LifeUser user = lifeUserMapper.selectOne(wrapper);
-            
-            if (user == null) {
-                logger.warn("无效的验证令牌: {}", token);
-                return Response.error("无效的验证链接，请重新注册");
-            }
-            
-            if (user.getEmailVerified()) {
-                logger.info("邮箱 {} 已经验证过", user.getEmail());
-                return Response.success("邮箱已经验证过");
-            }
-            
-            // 更新用户状态为已验证
-            user.setEmailVerified(true);
-            user.setVerificationToken(null); // 验证后清除令牌
-            lifeUserMapper.updateById(user);
-            
-            logger.info("用户 {} 的邮箱 {} 验证成功", user.getUsername(), user.getEmail());
-            return Response.success("邮箱验证成功，您现在可以登录了");
+            String result = service.verifyEmail(token);
+            return Response.success(result);
+        } catch (RuntimeException e) {
+            logger.error("邮箱验证失败: {}", e.getMessage());
+            return Response.error(e.getMessage());
         } catch (Exception e) {
             logger.error("邮箱验证失败: {}", e.getMessage());
             return Response.error("邮箱验证失败，请稍后重试");

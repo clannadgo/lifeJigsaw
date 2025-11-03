@@ -30,4 +30,33 @@ public interface LifeUserInterface {
      * @return 修改成功返回true，失败返回false
      */
     boolean updateUser(UpdateUserQo updateUserQo);
+    
+    /**
+     * 验证邮箱
+     * @param token 验证令牌
+     * @return 验证结果消息
+     * @throws RuntimeException 验证失败时抛出异常
+     */
+    String verifyEmail(String token);
+    
+    /**
+     * 根据用户名查询用户
+     * @param username 用户名
+     * @return 用户信息
+     */
+    LifeUser findByUsername(String username);
+    
+    /**
+     * 根据邮箱查询用户
+     * @param email 邮箱地址
+     * @return 用户信息，如果不存在返回null
+     */
+    LifeUser findByEmail(String email);
+    
+    /**
+     * 根据用户ID查询用户
+     * @param id 用户ID
+     * @return 用户信息
+     */
+    LifeUser findById(Long id);
 }
