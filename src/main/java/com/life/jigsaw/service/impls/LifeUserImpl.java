@@ -11,7 +11,6 @@ import com.life.jigsaw.mapper.LifeUserMapper;
 import com.life.jigsaw.service.LifeUserInterface;
 import com.life.jigsaw.service.EmailVerificationService;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -25,7 +24,7 @@ public class LifeUserImpl implements LifeUserInterface {
     @Resource
     LifeUserMapper lifeUserMapper;
 
-    @Autowired
+    @Resource
     private EmailVerificationService emailVerificationService;
 
     @Transactional

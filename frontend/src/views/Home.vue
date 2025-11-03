@@ -15,23 +15,6 @@
 
     <!-- 主要内容区域 -->
     <main class="main-content">
-      <!-- 介绍卡片 -->
-      <section class="intro-section">
-        <div class="container">
-          <div class="card intro-card">
-            <h2 class="section-title">欢迎来到人生拼图</h2>
-            <p class="intro-text">
-              人生就像一幅拼图，每一个经历、每一个选择都是其中的一块。在这里，你可以记录生活的点点滴滴，
-              拼凑出属于自己的完美人生画卷。无论是家庭、事业、健康还是兴趣爱好，都能在这里找到合适的位置。
-            </p>
-            <div class="action-buttons">
-              <router-link to="/login" class="btn btn-primary">登录</router-link>
-              <router-link to="/register" class="btn btn-secondary">注册</router-link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- 功能特性 -->
       <section class="features-section">
         <div class="container">
