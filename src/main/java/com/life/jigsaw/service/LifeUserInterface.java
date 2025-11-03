@@ -1,4 +1,4 @@
-package com.life.jigsaw.service.interfaces;
+package com.life.jigsaw.service;
 
 import com.life.jigsaw.controller.req.lifeuser.AddUserQo;
 import com.life.jigsaw.controller.req.lifeuser.LoginQo;

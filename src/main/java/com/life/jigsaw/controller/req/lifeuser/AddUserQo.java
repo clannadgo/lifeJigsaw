@@ -3,6 +3,7 @@ package com.life.jigsaw.controller.req.lifeuser;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -27,4 +28,9 @@ public class AddUserQo {
 
     @Schema(description = "家庭昵称")
     private String familyName;
+    
+    @Schema(description = "验证码")
+    @NotNull(message = "验证码不能为空")
+    @Pattern(regexp = "\\d{6}", message = "验证码必须是6位数字")
+    private String verificationCode;
 }

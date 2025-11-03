@@ -8,10 +8,14 @@ import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
 import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
 import com.life.jigsaw.mapper.LifeUserMapper;
-import com.life.jigsaw.service.interfaces.LifeUserInterface;
+import com.life.jigsaw.service.LifeUserInterface;
+import com.life.jigsaw.service.EmailVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
@@ -23,6 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 @RestController
 @Tag(name = "用户管理接口")
+@Validated
 public class LifeUserController {
     private static final Logger logger = LoggerFactory.getLogger(LifeUserController.class);
     
@@ -31,6 +36,24 @@ public class LifeUserController {
     
     @Resource
     private LifeUserMapper lifeUserMapper;
+    
+    @Resource
+    private EmailVerificationService emailVerificationService;
+
+    /**
+     * 发送邮箱验证码
+     */
+    @Operation(summary = "发送邮箱验证码")
+    @PostMapping("/user/sendEmailCode")
+    Response<String> sendEmailCode(@RequestParam @NotBlank(message = "邮箱不能为空") @Email(message = "邮箱格式不正确") String email){
+        try {
+            emailVerificationService.sendVerificationCode(email);
+            return Response.success("验证码已发送，请查收邮件");
+        } catch (Exception e) {
+            logger.error("发送验证码失败: {}", e.getMessage());
+            return Response.error("发送验证码失败，请稍后重试");
+        }
+    }
 
     /**
      * 新增用户
@@ -38,11 +61,16 @@ public class LifeUserController {
     @Operation(summary = "新增用户")
     @PostMapping("/user/add")
     Response<Integer> addUser(@RequestBody @Validated AddUserQo qo){
-        Integer result = service.addUser(qo);
-        if (result > 0) {
-            return Response.success(result, "注册成功，请查收邮箱完成验证");
-        } else {
-            return Response.error("用户名或家庭名称已存在");
+        try {
+            Integer result = service.addUser(qo);
+            if (result > 0) {
+                return Response.success(result, "注册成功");
+            } else {
+                return Response.error("用户名或家庭名称已存在");
+            }
+        } catch (Exception e) {
+            logger.error("注册失败: {}", e.getMessage());
+            return Response.error(e.getMessage());
         }
     }
     

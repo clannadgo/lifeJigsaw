@@ -8,16 +8,14 @@ import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
 import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
 import com.life.jigsaw.mapper.LifeUserMapper;
-import com.life.jigsaw.service.interfaces.LifeUserInterface;
-import com.life.jigsaw.service.EmailService;
+import com.life.jigsaw.service.LifeUserInterface;
+import com.life.jigsaw.service.EmailVerificationService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.UUID;
 
 @Service
 public class LifeUserImpl implements LifeUserInterface {
@@ -28,11 +26,17 @@ public class LifeUserImpl implements LifeUserInterface {
     LifeUserMapper lifeUserMapper;
 
     @Autowired
-    private EmailService emailService;
+    private EmailVerificationService emailVerificationService;
 
     @Transactional
     @Override
     public Integer addUser(AddUserQo qo) {
+        // 验证验证码
+        if (!emailVerificationService.verifyCode(qo.getEmail(), qo.getVerificationCode())) {
+            logger.warn("用户 {} 验证码验证失败", qo.getUsername());
+            throw new RuntimeException("验证码错误或已过期");
+        }
+        
         // 检查用户名是否已存在
         QueryWrapper<LifeUser> usernameWrapper = new QueryWrapper<>();
         usernameWrapper.eq("username", qo.getUsername());
@@ -48,9 +52,7 @@ public class LifeUserImpl implements LifeUserInterface {
             return 0; // 家庭名称已存在
         }
         
-        // 生成验证令牌
-        String verificationToken = UUID.randomUUID().toString();
-        
+        // 创建用户，邮箱直接设为已验证
         LifeUser user = new LifeUser();
         user.setUsername(qo.getUsername());
         // 使用PasswordUtils对密码进行加密
@@ -58,14 +60,12 @@ public class LifeUserImpl implements LifeUserInterface {
         user.setEmail(qo.getEmail());
         user.setPhone(qo.getPhone());
         user.setFamilyName(familyName);
-        user.setEmailVerified(false);
-        user.setVerificationToken(verificationToken);
+        user.setEmailVerified(true); // 验证码验证成功，直接设为已验证
         
         int result = lifeUserMapper.insert(user);
         
-        // 发送验证邮件
         if (result > 0) {
-            emailService.sendVerificationEmail(qo.getEmail(), verificationToken);
+            logger.info("用户 {} 注册成功", qo.getUsername());
         }
         
         return result;
