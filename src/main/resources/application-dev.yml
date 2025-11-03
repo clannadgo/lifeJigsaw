@@ -1,0 +1,12 @@
+applicationName: life_jigsaw
+serverPort: 5026
+database:
+    url: jdbc:mariadb://localhost:3306/life_jigsaw?useUnicode=true&character_set_server=utf8mb4&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    driver: org.mariadb.jdbc.Driver
+    username: root
+    password: 123456
+swaggerEnable: true
+
+logging:
+    level:
+        root: INFO
