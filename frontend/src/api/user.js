@@ -3,7 +3,7 @@ import request from '../utils/request'
 // 用户登录
 export const login = (data) => {
   return request({
-    url: '/api/user/login',
+    url: '/user/login',
     method: 'post',
     data
   })
@@ -12,16 +12,16 @@ export const login = (data) => {
 // 发送邮箱验证码
 export const sendEmailCode = (email) => {
   return request({
-    url: '/api/user/sendEmailCode',
+    url: '/user/sendEmailCode',
     method: 'post',
-    data: { email }
+    params: { email }
   })
 }
 
 // 新增用户
 export const addUser = (data) => {
   return request({
-    url: '/api/user/add',
+    url: '/user/add',
     method: 'post',
     data
   })
@@ -30,7 +30,7 @@ export const addUser = (data) => {
 // 修改密码
 export const changePassword = (data) => {
   return request({
-    url: '/api/user/changePassword',
+    url: '/user/changePassword',
     method: 'post',
     data
   })
@@ -39,7 +39,7 @@ export const changePassword = (data) => {
 // 修改用户信息
 export const updateUser = (data) => {
   return request({
-    url: '/api/user/update',
+    url: '/user/update',
     method: 'post',
     data
   })
