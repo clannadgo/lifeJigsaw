@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // 导入页面组件
 import Home from '../views/Home.vue'
+import Register from '../views/Register.vue'
 
 // 路由配置
 const routes = [
@@ -22,14 +23,14 @@ const routes = [
   //     title: '登录'
   //   }
   // },
-  // {
-  //   path: '/register',
-  //   name: 'Register',
-  //   component: () => import('../views/Register.vue'),
-  //   meta: {
-  //     title: '注册'
-  //   }
-  // },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
+    meta: {
+      title: '人生拼图 - 用户注册'
+    }
+  },
   // 捕获所有未匹配的路由，重定向到首页
   {
     path: '/:pathMatch(.*)*',
