@@ -21,6 +21,14 @@ publicRequest.interceptors.response.use(
       showMessage(res.message || '请求失败', 'error')
       return Promise.reject(new Error(res.message || '请求失败'))
     } else {
+      // 如果响应中包含token，保存到localStorage
+      if (res.data && res.data.token) {
+        localStorage.setItem('token', res.data.token)
+        // 保存用户信息
+        if (res.data.user) {
+          localStorage.setItem('user', JSON.stringify(res.data.user))
+        }
+      }
       return res
     }
   },
@@ -38,10 +46,10 @@ publicRequest.interceptors.response.use(
   }
 )
 
-// 用户登录 - 仍然使用原request，因为可能需要处理token响应
+// 用户登录 - 使用无认证的axios实例，与sendEmailCode保持一致的模式
 export const login = (data) => {
-  return request({
-    url: '/user/login',
+  return publicRequest({
+    url: '/api/user/login', // 添加/api前缀，与代理配置匹配
     method: 'post',
     data
   })
