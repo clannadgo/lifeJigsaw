@@ -64,7 +64,8 @@ public class EmailVerificationService {
         EmailVerificationCode verificationCode = new EmailVerificationCode();
         verificationCode.setEmail(email);
         verificationCode.setCode(code);
-        verificationCode.setCreateTime(now);
+        // 将LocalDateTime转换为Date
+        verificationCode.setCreateTime(java.sql.Timestamp.valueOf(now));
         verificationCode.setExpireTime(expireTime);
         verificationCode.setUsed(false);
         

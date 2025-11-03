@@ -14,25 +14,6 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "spring.mail")
 @Data
 public class EmailConfig {
-    
-    /**
-     * 邮箱授权码（从外部文件加载）
-     */
     private String password;
-    
-    /**
-     * 获取邮箱授权码
-     * @return 邮箱授权码
-     */
-    public String getPassword() {
-        return password;
-    }
-    
-    /**
-     * 设置邮箱授权码
-     * @param password 邮箱授权码
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
+
 }
