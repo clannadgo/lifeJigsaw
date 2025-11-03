@@ -18,7 +18,7 @@ server:
 
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: false
+    map-underscore-to-camel-case: true
   global-config:
     db-config:
       id-type: auto
@@ -102,8 +102,8 @@ spring:
   mail:
     host: smtp.qq.com
     port: 465
-    username: 980999197@qq.com   
-    password: your-16-digit-authorization-code  # 替换为你的授权码
+    username: 980999197@qq.com
+    password: nmtdxezbznzobdjd  # 替换为你的授权码
     properties:
       mail:
         smtp:
