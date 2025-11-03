@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { showMessage } from './message.js'
 
 //// 创建axios实例
 const service = axios.create({
@@ -18,13 +19,18 @@ service.interceptors.request.use(
   config => {
     // 检查是否为公开接口
     const isPublicPath = PUBLIC_PATHS.some(path => config.url.includes(path))
-    if (!isPublicPath) {
+    
+    if (isPublicPath) {
+      // 对于公开接口，显式删除Authorization头，确保不会发送认证信息
+      delete config.headers['Authorization']
+    } else {
       // 非公开接口才添加token认证信息
       const token = localStorage.getItem('token')
       if (token) {
         config.headers['Authorization'] = `Bearer ${token}`
       }
     }
+    
     return config
   },
   error => {
@@ -43,6 +49,8 @@ service.interceptors.response.use(
     if (res.code && res.code !== '0000' && res.code !== 200) {
       // 错误处理逻辑
       console.error('响应错误:', res.message)
+      // 显示错误提示
+      showMessage(res.message || '请求失败', 'error')
       return Promise.reject(new Error(res.message || '请求失败'))
     } else {
       // 如果响应中包含token，保存到localStorage
@@ -65,18 +73,25 @@ service.interceptors.response.use(
     
     // 401未授权，清除token并跳转到登录页
     if (error.response && error.response.status === 401) {
-      console.log('未授权，请重新登录')
+      const errorMsg = '未授权，请重新登录'
+      console.log(errorMsg)
+      showMessage(errorMsg, 'error')
       // 清除token和用户信息
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       // 跳转到登录页
-      window.location.href = '/login'
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 1500)
     }
     // 特殊处理邮箱未验证错误
     else if (errorMessage.includes('请先验证您的邮箱')) {
       console.error('邮箱验证错误:', errorMessage)
+      showMessage(errorMessage, 'error')
     } else {
       console.error('响应错误:', errorMessage)
+      // 显示通用错误提示
+      showMessage(errorMessage || '网络请求失败，请稍后重试', 'error')
     }
     return Promise.reject(new Error(errorMessage || '请求失败'))
   }
