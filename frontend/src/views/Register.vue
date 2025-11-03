@@ -210,10 +210,24 @@ export default {
       
       try {
         const response = await addUser(this.formData)
-        if (response && response.code === 200) {
-          this.$message.success(response.message || '注册成功，正在跳转到首页！')
-          // 注册成功后跳转到首页
-          this.$router.push('/')
+        if (response && (response.code === 200 || response.code === '0000')) {
+          // 检查响应中是否包含token和用户信息
+          if (response.data && response.data.token) {
+            // 如果有token，保存到localStorage
+            localStorage.setItem('token', response.data.token)
+            if (response.data.user) {
+              localStorage.setItem('user', JSON.stringify(response.data.user))
+            }
+            this.$message.success(response.message || '注册成功，正在跳转到首页！')
+            // 有token时直接跳转到首页
+            this.$router.push('/')
+          } else {
+            // 没有token时，提示用户注册成功并跳转到登录页
+            this.$message.success(response.message || '注册成功，请登录！')
+            setTimeout(() => {
+              this.$router.push('/login')
+            }, 1500)
+          }
         } else {
           this.errorMessage = response?.message || '注册失败，请重试'
         }
