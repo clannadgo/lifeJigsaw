@@ -194,13 +194,13 @@ export default {
       
       try {
         const response = await addUser(this.formData)
-          if (response && response.code === 200) {
-            this.$message.success(response.message || '注册成功，正在跳转到首页！')
-            // 注册成功后跳转到首页
-            this.$router.push('/')
-          } else {
-            this.errorMessage = response?.message || '注册失败，请重试'
-          }
+        if (response && response.code === 200) {
+          this.$message.success(response.message || '注册成功，正在跳转到首页！')
+          // 注册成功后跳转到首页
+          this.$router.push('/')
+        } else {
+          this.errorMessage = response?.message || '注册失败，请重试'
+        }
       } catch (error) {
         console.error('注册失败:', error)
         this.errorMessage = error.response?.data?.message || '用户名或家庭名称已存在'
@@ -297,9 +297,7 @@ export default {
 .btn-secondary:disabled {
   background-color: #BDC3C7;
   cursor: not-allowed;
-}
-  transition: border-color 0.3s;
-}
+} /* 确保闭合花括号存在 */
 
 .form-group input:focus {
   outline: none;
