@@ -6,13 +6,24 @@ const service = axios.create({
   baseURL: '/api/puzzle/v2'
 })
 
+// 公开接口路径白名单
+const PUBLIC_PATHS = [
+  '/user/login',
+  '/user/add',
+  '/user/sendEmailCode'
+]
+
 // request拦截器
 service.interceptors.request.use(
   config => {
-    // 这里可以添加token等认证信息
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
+    // 检查是否为公开接口
+    const isPublicPath = PUBLIC_PATHS.some(path => config.url.includes(path))
+    if (!isPublicPath) {
+      // 非公开接口才添加token认证信息
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`
+      }
     }
     return config
   },
