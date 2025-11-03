@@ -195,9 +195,9 @@ export default {
       try {
         const response = await addUser(this.formData)
           if (response && response.code === 200) {
-            this.$message.success(response.message || '注册成功！')
-            // 注册成功后跳转到登录页面
-            this.$router.push('/login')
+            this.$message.success(response.message || '注册成功，正在跳转到首页！')
+            // 注册成功后跳转到首页
+            this.$router.push('/')
           } else {
             this.errorMessage = response?.message || '注册失败，请重试'
           }

@@ -2,6 +2,7 @@ package com.life.jigsaw.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.life.jigsaw.common.response.Response;
+import com.life.jigsaw.common.utils.JwtUtils;
 import com.life.jigsaw.controller.req.lifeuser.AddUserQo;
 import com.life.jigsaw.controller.req.lifeuser.LoginQo;
 import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
@@ -20,6 +21,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * user controller
@@ -60,11 +63,23 @@ public class LifeUserController {
      */
     @Operation(summary = "新增用户")
     @PostMapping("/user/add")
-    Response<Integer> addUser(@RequestBody @Validated AddUserQo qo){
+    Response<Map<String, Object>> addUser(@RequestBody @Validated AddUserQo qo){
         try {
             Integer result = service.addUser(qo);
             if (result > 0) {
-                return Response.success(result, "注册成功");
+                // 查询新注册的用户信息
+                LifeUser user = lifeUserMapper.selectOne(new QueryWrapper<LifeUser>()
+                        .eq("username", qo.getUsername()));
+                
+                // 生成JWT token
+                String token = JwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName());
+                
+                // 构建响应数据
+                Map<String, Object> data = new HashMap<>();
+                data.put("token", token);
+                data.put("user", user);
+                
+                return Response.success(data, "注册成功");
             } else {
                 return Response.error("用户名或家庭名称已存在");
             }
@@ -114,10 +129,18 @@ public class LifeUserController {
      */
     @Operation(summary = "用户登录")
     @PostMapping("/user/login")
-    Response<LifeUser> login(@RequestBody @Validated LoginQo loginQo){
+    Response<Map<String, Object>> login(@RequestBody @Validated LoginQo loginQo){
         LifeUser user = service.login(loginQo);
         if (user != null) {
-            return Response.success(user);
+            // 生成JWT token
+            String token = JwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName());
+            
+            // 构建响应数据
+            Map<String, Object> data = new HashMap<>();
+            data.put("token", token);
+            data.put("user", user);
+            
+            return Response.success(data);
         } else {
             return Response.error("用户名或密码错误");
         }

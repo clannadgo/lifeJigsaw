@@ -81,13 +81,12 @@ export default {
         const response = await login(loginForm.value)
         
         if (response.code === '0000' || response.code === 200) {
-          // 保存登录状态
-          localStorage.setItem('userInfo', JSON.stringify(response.data))
-          localStorage.setItem('token', response.data.token || '')
-          
+          // token和用户信息会被request.js中的响应拦截器自动保存到localStorage
           showMessage('登录成功', 'success')
-          // 登录成功后跳转到首页
-          router.push('/')
+          
+          // 获取重定向URL，如果没有则跳转到首页
+          const redirectUrl = router.currentRoute.value.query.redirect || '/'
+          router.push(redirectUrl)
         } else {
           showMessage(response.message || '登录失败，请重试', 'error')
         }
