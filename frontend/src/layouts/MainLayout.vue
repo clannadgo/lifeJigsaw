@@ -10,10 +10,16 @@
           </router-link>
         </div>
         
-        <!-- 右侧用户信息 -->
-        <div class="user-info" v-if="userInfo">
-          <span class="family-name">{{ userInfo.familyName }}</span>
-          <button class="logout-btn" @click="handleLogout">退出登录</button>
+        <!-- 右侧用户信息或登录按钮 -->
+        <div class="user-info">
+          <div v-if="userInfo">
+            <span class="family-name">{{ userInfo.familyName }}</span>
+            <button class="logout-btn" @click="handleLogout">退出登录</button>
+          </div>
+          <div v-else>
+            <router-link to="/login" class="login-btn">登录</router-link>
+            <router-link to="/register" class="register-btn">注册</router-link>
+          </div>
         </div>
       </div>
     </header>
@@ -138,6 +144,35 @@ export default {
 
 .logout-btn:hover {
   background-color: #d32f2f;
+}
+
+.login-btn, .register-btn {
+  padding: 8px 16px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.login-btn {
+  background-color: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.login-btn:hover {
+  background-color: rgba(255,255,255,0.3);
+}
+
+.register-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.register-btn:hover {
+  background-color: #45a049;
 }
 
 .content {
