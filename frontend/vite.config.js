@@ -12,7 +12,7 @@ export default defineConfig({
     // 配置代理，将/api开头的请求转发到后端服务
     proxy: {
       '/api': {
-        target: 'http://localhost:8080', // 假设后端服务运行在8080端口
+        target: 'http://localhost:5026/api/puzzle/v2', // 后端服务运行在5026端口，context-path是/api/puzzle/v2
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

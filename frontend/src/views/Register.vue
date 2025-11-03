@@ -87,8 +87,8 @@ export default {
         return
       }
       
-      if (this.formData.username.length < 3) {
-        this.errorMessage = '用户名至少需要3个字符'
+      if (this.formData.username.length < 2) {
+        this.errorMessage = '用户名至少需要2个字符'
         return
       }
       
