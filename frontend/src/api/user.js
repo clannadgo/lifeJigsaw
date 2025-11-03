@@ -1,6 +1,13 @@
+import axios from 'axios'
 import request from '../utils/request'
 
-// 用户登录
+// 创建一个无认证的axios实例用于公开接口
+const publicRequest = axios.create({
+  timeout: 10000,
+  baseURL: '/api/puzzle/v2'
+})
+
+// 用户登录 - 仍然使用原request，因为可能需要处理token响应
 export const login = (data) => {
   return request({
     url: '/user/login',
@@ -9,18 +16,18 @@ export const login = (data) => {
   })
 }
 
-// 发送邮箱验证码
+// 发送邮箱验证码 - 使用无认证的axios实例
 export const sendEmailCode = (email) => {
-  return request({
+  return publicRequest({
     url: '/user/sendEmailCode',
     method: 'post',
-    params: { email }
+    data: { email }
   })
 }
 
-// 新增用户
+// 新增用户 - 使用无认证的axios实例
 export const addUser = (data) => {
-  return request({
+  return publicRequest({
     url: '/user/add',
     method: 'post',
     data
