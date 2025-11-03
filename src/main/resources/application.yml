@@ -103,7 +103,7 @@ spring:
     host: smtp.qq.com
     port: 465
     username: 980999197@qq.com
-    password: nmtdxezbznzobdjd  # 替换为你的授权码
+    password: xxxx  # 替换为你的授权码
     properties:
       mail:
         smtp:
