@@ -138,13 +138,10 @@ export default {
       this.isSendingCode = true
       
       try {
-        const response = await sendEmailCode(this.formData.email)
-        if (response && response.code === 200) {
-          this.$message.success('验证码已发送，请查收邮箱')
-          this.startCountDown()
-        } else {
-          this.errorMessage = response?.message || '发送验证码失败，请重试'
-        }
+        await sendEmailCode(this.formData.email)
+        // 由于响应拦截器已经统一处理了错误情况，这里只需要处理成功的情况
+        this.$message.success('验证码已发送，请查收邮箱')
+        this.startCountDown()
       } catch (error) {
         console.error('发送验证码失败:', error)
         this.errorMessage = error.response?.data?.message || '发送验证码失败'
@@ -209,15 +206,10 @@ export default {
       this.isLoading = true
       
       try {
-        const response = await addUser(this.formData)
-        if (response && (response.code === 200 || response.code === '0000')) {
+          // 由于响应拦截器已经统一处理了错误情况，这里只需要处理成功的情况
+          const response = await addUser(this.formData)
           // 检查响应中是否包含token和用户信息
           if (response.data && response.data.token) {
-            // 如果有token，保存到localStorage
-            localStorage.setItem('token', response.data.token)
-            if (response.data.user) {
-              localStorage.setItem('user', JSON.stringify(response.data.user))
-            }
             this.$message.success(response.message || '注册成功，正在跳转到首页！')
             // 有token时直接跳转到首页
             this.$router.push('/')
@@ -228,9 +220,6 @@ export default {
               this.$router.push('/login')
             }, 1500)
           }
-        } else {
-          this.errorMessage = response?.message || '注册失败，请重试'
-        }
       } catch (error) {
         console.error('注册失败:', error)
         this.errorMessage = error.response?.data?.message || '用户名或家庭名称已存在'
