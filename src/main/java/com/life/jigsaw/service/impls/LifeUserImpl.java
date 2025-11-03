@@ -9,15 +9,28 @@ import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
 import com.life.jigsaw.mapper.LifeUserMapper;
 import com.life.jigsaw.service.interfaces.LifeUserInterface;
+import com.life.jigsaw.service.EmailService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 @Service
 public class LifeUserImpl implements LifeUserInterface {
 
+    private static final Logger logger = LoggerFactory.getLogger(LifeUserImpl.class);
+    
     @Resource
     LifeUserMapper lifeUserMapper;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Transactional
     @Override
     public Integer addUser(AddUserQo qo) {
         // 检查用户名是否已存在
@@ -35,6 +48,9 @@ public class LifeUserImpl implements LifeUserInterface {
             return 0; // 家庭名称已存在
         }
         
+        // 生成验证令牌
+        String verificationToken = UUID.randomUUID().toString();
+        
         LifeUser user = new LifeUser();
         user.setUsername(qo.getUsername());
         // 使用PasswordUtils对密码进行加密
@@ -42,7 +58,17 @@ public class LifeUserImpl implements LifeUserInterface {
         user.setEmail(qo.getEmail());
         user.setPhone(qo.getPhone());
         user.setFamilyName(familyName);
-        return lifeUserMapper.insert(user);
+        user.setEmailVerified(false);
+        user.setVerificationToken(verificationToken);
+        
+        int result = lifeUserMapper.insert(user);
+        
+        // 发送验证邮件
+        if (result > 0) {
+            emailService.sendVerificationEmail(qo.getEmail(), verificationToken);
+        }
+        
+        return result;
     }
 
     @Override
@@ -55,6 +81,12 @@ public class LifeUserImpl implements LifeUserInterface {
         // 如果用户不存在，返回null
         if (user == null) {
             return null;
+        }
+        
+        // 检查邮箱是否已验证
+        if (!user.getEmailVerified()) {
+            logger.info("用户 {} 尝试登录，但邮箱未验证", loginQo.getUsername());
+            throw new RuntimeException("请先验证您的邮箱后再登录");
         }
         
         // 使用PasswordUtils验证密码

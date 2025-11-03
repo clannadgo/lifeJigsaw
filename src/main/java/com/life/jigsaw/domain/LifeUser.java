@@ -16,4 +16,8 @@ public class LifeUser extends BaseEntity{
     private String phone;
     private String familyName;
     private String email;
+    
+    // 邮箱验证相关字段
+    private Boolean emailVerified = false; // 邮箱是否已验证
+    private String verificationToken; // 邮箱验证令牌
 }

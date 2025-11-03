@@ -126,13 +126,13 @@ export default {
       
       try {
         const response = await addUser(this.formData)
-        if (response && response.code === 200) {
-          this.$message.success('注册成功！')
-          // 注册成功后跳转到登录页面
-          this.$router.push('/login')
-        } else {
-          this.errorMessage = response?.message || '注册失败，请重试'
-        }
+          if (response && response.code === 200) {
+            this.$message.success(response.message || '注册成功！')
+            // 显示提示信息，不立即跳转
+            alert('注册成功！请查收您的邮箱完成验证，验证后才能登录。')
+          } else {
+            this.errorMessage = response?.message || '注册失败，请重试'
+          }
       } catch (error) {
         console.error('注册失败:', error)
         this.errorMessage = error.response?.data?.message || '用户名或家庭名称已存在'

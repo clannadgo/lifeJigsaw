@@ -28,7 +28,7 @@ service.interceptors.response.use(
     
     // 根据后端返回的数据格式，这里可以做统一的错误处理
     // 假设后端返回的数据格式为 { code: 200, message: 'success', data: {} }
-    if (res.code && res.code !== 200) {
+    if (res.code && res.code !== '0000' && res.code !== 200) {
       // 错误处理逻辑
       console.error('响应错误:', res.message)
       return Promise.reject(new Error(res.message || '请求失败'))
@@ -37,9 +37,18 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.error('响应错误:', error.message)
-    // 可以在这里添加统一的错误处理，如网络错误提示等
-    return Promise.reject(error)
+    // 优化错误信息显示
+    let errorMessage = error.message
+    if (error.response && error.response.data) {
+      errorMessage = error.response.data.message || errorMessage
+    }
+    // 特殊处理邮箱未验证错误
+    if (errorMessage.includes('请先验证您的邮箱')) {
+      console.error('邮箱验证错误:', errorMessage)
+    } else {
+      console.error('响应错误:', errorMessage)
+    }
+    return Promise.reject(new Error(errorMessage || '请求失败'))
   }
 )
 

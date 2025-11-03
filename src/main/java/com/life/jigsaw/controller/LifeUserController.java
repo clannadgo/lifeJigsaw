@@ -1,17 +1,21 @@
 package com.life.jigsaw.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.life.jigsaw.common.response.Response;
 import com.life.jigsaw.controller.req.lifeuser.AddUserQo;
 import com.life.jigsaw.controller.req.lifeuser.LoginQo;
 import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
 import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
+import com.life.jigsaw.mapper.LifeUserMapper;
 import com.life.jigsaw.service.interfaces.LifeUserInterface;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * user controller
@@ -20,8 +24,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Tag(name = "用户管理接口")
 public class LifeUserController {
+    private static final Logger logger = LoggerFactory.getLogger(LifeUserController.class);
+    
     @Resource
     private LifeUserInterface service;
+    
+    @Resource
+    private LifeUserMapper lifeUserMapper;
 
     /**
      * 新增用户
@@ -31,9 +40,44 @@ public class LifeUserController {
     Response<Integer> addUser(@RequestBody @Validated AddUserQo qo){
         Integer result = service.addUser(qo);
         if (result > 0) {
-            return Response.success(result);
+            return Response.success(result, "注册成功，请查收邮箱完成验证");
         } else {
             return Response.error("用户名或家庭名称已存在");
+        }
+    }
+    
+    /**
+     * 验证邮箱
+     */
+    @Operation(summary = "邮箱验证")
+    @GetMapping("/user/verify-email")
+    Response<String> verifyEmail(@RequestParam String token) {
+        try {
+            // 根据令牌查找用户
+            QueryWrapper<LifeUser> wrapper = new QueryWrapper<>();
+            wrapper.eq("verification_token", token);
+            LifeUser user = lifeUserMapper.selectOne(wrapper);
+            
+            if (user == null) {
+                logger.warn("无效的验证令牌: {}", token);
+                return Response.error("无效的验证链接，请重新注册");
+            }
+            
+            if (user.getEmailVerified()) {
+                logger.info("邮箱 {} 已经验证过", user.getEmail());
+                return Response.success("邮箱已经验证过");
+            }
+            
+            // 更新用户状态为已验证
+            user.setEmailVerified(true);
+            user.setVerificationToken(null); // 验证后清除令牌
+            lifeUserMapper.updateById(user);
+            
+            logger.info("用户 {} 的邮箱 {} 验证成功", user.getUsername(), user.getEmail());
+            return Response.success("邮箱验证成功，您现在可以登录了");
+        } catch (Exception e) {
+            logger.error("邮箱验证失败: {}", e.getMessage());
+            return Response.error("邮箱验证失败，请稍后重试");
         }
     }
     
