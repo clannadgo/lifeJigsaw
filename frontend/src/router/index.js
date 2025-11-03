@@ -68,8 +68,8 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !hasToken) {
     // 需要认证但没有token，重定向到登录页
     next({ path: '/login', query: { redirect: to.fullPath } })
-  } else if (!requiresAuth && hasToken && to.path === '/login') {
-    // 不需要认证且有token，且当前是登录页，重定向到首页
+  } else if (!requiresAuth && hasToken && (to.path === '/login' || to.path === '/register')) {
+    // 不需要认证且有token，且当前是登录页或注册页，重定向到首页
     next({ path: '/' })
   } else {
     // 其他情况正常继续
