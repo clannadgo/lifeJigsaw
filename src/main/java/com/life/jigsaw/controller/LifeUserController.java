@@ -1,10 +1,10 @@
 package com.life.jigsaw.controller;
 
 import com.life.jigsaw.common.response.Response;
-import com.life.jigsaw.common.utils.PasswordUtils;
 import com.life.jigsaw.controller.req.lifeuser.AddUserQo;
 import com.life.jigsaw.controller.req.lifeuser.LoginQo;
 import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
+import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
 import com.life.jigsaw.service.interfaces.LifeUserInterface;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,6 +57,20 @@ public class LifeUserController {
             return Response.success(true);
         } else {
             return Response.error("用户名不存在或旧密码错误");
+        }
+    }
+    
+    /**
+     * 修改用户信息
+     */
+    @Operation(summary = "修改用户信息")
+    @PostMapping("/user/update")
+    Response<Boolean> updateUser(@RequestBody @Validated UpdateUserQo updateUserQo){
+        boolean result = service.updateUser(updateUserQo);
+        if (result) {
+            return Response.success(true);
+        } else {
+            return Response.error("用户不存在或用户名已被使用");
         }
     }
 }

@@ -5,6 +5,7 @@ import com.life.jigsaw.common.utils.PasswordUtils;
 import com.life.jigsaw.controller.req.lifeuser.AddUserQo;
 import com.life.jigsaw.controller.req.lifeuser.LoginQo;
 import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
+import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
 import com.life.jigsaw.mapper.LifeUserMapper;
 import com.life.jigsaw.service.interfaces.LifeUserInterface;
@@ -82,6 +83,40 @@ public class LifeUserImpl implements LifeUserInterface {
         
         // 更新用户密码
         user.setPassword(encryptedNewPassword);
+        int result = lifeUserMapper.updateById(user);
+        
+        // 返回更新是否成功
+        return result > 0;
+    }
+    
+    @Override
+    public boolean updateUser(UpdateUserQo updateUserQo) {
+        // 根据用户ID查询用户
+        LifeUser user = lifeUserMapper.selectById(updateUserQo.getId());
+        
+        // 如果用户不存在，返回false
+        if (user == null) {
+            return false;
+        }
+        
+        // 检查用户名是否重复（如果用户名变更了）
+        if (!user.getUsername().equals(updateUserQo.getUsername())) {
+            QueryWrapper<LifeUser> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("username", updateUserQo.getUsername());
+            LifeUser existingUser = lifeUserMapper.selectOne(queryWrapper);
+            if (existingUser != null) {
+                // 用户名已存在，返回false
+                return false;
+            }
+        }
+        
+        // 更新用户信息
+        user.setUsername(updateUserQo.getUsername());
+        user.setPhone(updateUserQo.getPhone());
+        user.setFamilyName(generateFamilyName(updateUserQo.getFamilyName(), updateUserQo.getUsername()));
+        user.setEmail(updateUserQo.getEmail());
+        
+        // 执行更新操作
         int result = lifeUserMapper.updateById(user);
         
         // 返回更新是否成功

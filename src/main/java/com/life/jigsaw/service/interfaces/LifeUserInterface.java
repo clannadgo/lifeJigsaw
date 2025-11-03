@@ -3,6 +3,7 @@ package com.life.jigsaw.service.interfaces;
 import com.life.jigsaw.controller.req.lifeuser.AddUserQo;
 import com.life.jigsaw.controller.req.lifeuser.LoginQo;
 import com.life.jigsaw.controller.req.lifeuser.ChangePasswordQo;
+import com.life.jigsaw.controller.req.lifeuser.UpdateUserQo;
 import com.life.jigsaw.domain.LifeUser;
 
 public interface LifeUserInterface {
@@ -22,4 +23,11 @@ public interface LifeUserInterface {
      * @return 修改成功返回true，失败返回false
      */
     boolean changePassword(ChangePasswordQo changePasswordQo);
+    
+    /**
+     * 修改用户信息
+     * @param updateUserQo 修改用户信息请求参数
+     * @return 修改成功返回true，失败返回false
+     */
+    boolean updateUser(UpdateUserQo updateUserQo);
 }
