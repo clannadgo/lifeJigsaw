@@ -2,6 +2,8 @@ package com.life.jigsaw.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
@@ -15,6 +17,7 @@ public class BaseEntity {
 
     @TableId(type = IdType.AUTO)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer id;
 
     @TableField(fill = FieldFill.INSERT)

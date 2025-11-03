@@ -28,6 +28,28 @@
             />
           </div>
           <div class="form-group">
+            <label for="verificationCode">验证码</label>
+            <div class="verification-code-group">
+              <input
+                type="text"
+                id="verificationCode"
+                v-model="formData.verificationCode"
+                placeholder="请输入6位验证码"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                required
+              />
+              <button
+                type="button"
+                class="btn btn-secondary"
+                :disabled="isSendingCode || countDown > 0"
+                @click="sendVerificationCode"
+              >
+                {{ countDown > 0 ? `${countDown}秒后重试` : '获取验证码' }}
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
             <label for="password">密码</label>
             <input
               type="password"
@@ -73,7 +95,7 @@
 </template>
 
 <script>
-import { addUser } from '../api/user.js'
+import { addUser, sendEmailCode } from '../api/user.js'
 
 export default {
   name: 'Register',
@@ -82,15 +104,55 @@ export default {
       formData: {
         username: '',
         email: '',
+        verificationCode: '',
         password: '',
         familyName: ''
       },
       confirmPassword: '',
       isLoading: false,
+      isSendingCode: false,
+      countDown: 0,
       errorMessage: ''
     }
   },
   methods: {
+    async sendVerificationCode() {
+      // 邮箱格式验证
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(this.formData.email)) {
+        this.errorMessage = '请输入有效的邮箱地址'
+        return
+      }
+      
+      this.errorMessage = ''
+      this.isSendingCode = true
+      
+      try {
+        const response = await sendEmailCode(this.formData.email)
+        if (response && response.code === 200) {
+          this.$message.success('验证码已发送，请查收邮箱')
+          this.startCountDown()
+        } else {
+          this.errorMessage = response?.message || '发送验证码失败，请重试'
+        }
+      } catch (error) {
+        console.error('发送验证码失败:', error)
+        this.errorMessage = error.response?.data?.message || '发送验证码失败'
+      } finally {
+        this.isSendingCode = false
+      }
+    },
+    
+    startCountDown() {
+      this.countDown = 60
+      const timer = setInterval(() => {
+        this.countDown--
+        if (this.countDown <= 0) {
+          clearInterval(timer)
+        }
+      }, 1000)
+    },
+    
     async handleRegister() {
       // 表单验证
       if (this.formData.password !== this.confirmPassword) {
@@ -107,6 +169,12 @@ export default {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(this.formData.email)) {
         this.errorMessage = '请输入有效的邮箱地址'
+        return
+      }
+      
+      // 验证码格式验证
+      if (!/^\d{6}$/.test(this.formData.verificationCode)) {
+        this.errorMessage = '请输入6位数字验证码'
         return
       }
       
@@ -128,8 +196,8 @@ export default {
         const response = await addUser(this.formData)
           if (response && response.code === 200) {
             this.$message.success(response.message || '注册成功！')
-            // 显示提示信息，不立即跳转
-            alert('注册成功！请查收您的邮箱完成验证，验证后才能登录。')
+            // 注册成功后跳转到登录页面
+            this.$router.push('/login')
           } else {
             this.errorMessage = response?.message || '注册失败，请重试'
           }
@@ -198,6 +266,38 @@ export default {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 16px;
+}
+
+.verification-code-group {
+  display: flex;
+  gap: 12px;
+}
+
+.verification-code-group input {
+  flex: 1;
+}
+
+.btn-secondary {
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: var(--secondary-color);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #E55A5A;
+}
+
+.btn-secondary:disabled {
+  background-color: #BDC3C7;
+  cursor: not-allowed;
+}
   transition: border-color 0.3s;
 }
 

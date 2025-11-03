@@ -9,6 +9,15 @@ export const login = (data) => {
   })
 }
 
+// 发送邮箱验证码
+export const sendEmailCode = (email) => {
+  return request({
+    url: '/api/user/sendEmailCode',
+    method: 'post',
+    data: { email }
+  })
+}
+
 // 新增用户
 export const addUser = (data) => {
   return request({
