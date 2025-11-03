@@ -42,6 +42,7 @@
               <button
                 type="button"
                 class="btn btn-secondary"
+                :class="{ 'countdown-active': countDown > 0 }"
                 :disabled="isSendingCode || countDown > 0"
                 @click="sendVerificationCode"
               >
@@ -112,7 +113,16 @@ export default {
       isLoading: false,
       isSendingCode: false,
       countDown: 0,
-      errorMessage: ''
+      errorMessage: '',
+      // 存储定时器ID，用于组件销毁时清除
+      countDownTimer: null
+    }
+  },
+  
+  beforeDestroy() {
+    // 组件销毁前清除定时器，避免内存泄漏
+    if (this.countDownTimer) {
+      clearInterval(this.countDownTimer)
     }
   },
   methods: {
@@ -144,11 +154,17 @@ export default {
     },
     
     startCountDown() {
+      // 清除可能存在的旧定时器
+      if (this.countDownTimer) {
+        clearInterval(this.countDownTimer)
+      }
+      
       this.countDown = 60
-      const timer = setInterval(() => {
+      this.countDownTimer = setInterval(() => {
         this.countDown--
         if (this.countDown <= 0) {
-          clearInterval(timer)
+          clearInterval(this.countDownTimer)
+          this.countDownTimer = null
         }
       }, 1000)
     },
@@ -297,7 +313,14 @@ export default {
 .btn-secondary:disabled {
   background-color: #BDC3C7;
   cursor: not-allowed;
-} /* 确保闭合花括号存在 */
+  opacity: 0.7;
+}
+
+/* 倒计时状态的按钮样式，使其更明显 */
+.btn-secondary:disabled.countdown-active {
+  background-color: #95A5A6;
+  font-size: 13px;
+}
 
 .form-group input:focus {
   outline: none;
