@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Register from '../views/Register.vue'
 import MainLayout from '../layouts/MainLayout.vue'
+import Dashboard from '../views/Dashboard.vue'
 
 // 路由配置
 const routes = [
@@ -43,12 +44,20 @@ const routes = [
       requiresAuth: false
     }
   },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: {
+      title: '人生拼图 - 控制台',
+      requiresAuth: true
+    }
+  },
   // 捕获所有未匹配的路由，重定向到首页
   {
     path: '/:pathMatch(.*)*',
     redirect: '/'
-  }
-]
+  }]
 
 // 创建路由实例
 const router = createRouter({
@@ -69,8 +78,8 @@ router.beforeEach((to, from, next) => {
     // 需要认证但没有token，重定向到登录页
     next({ path: '/login', query: { redirect: to.fullPath } })
   } else if (!requiresAuth && hasToken && (to.path === '/login' || to.path === '/register')) {
-    // 不需要认证且有token，且当前是登录页或注册页，重定向到首页
-    next({ path: '/' })
+    // 不需要认证且有token，且当前是登录页或注册页，重定向到控制台
+    next({ path: '/dashboard' })
   } else {
     // 其他情况正常继续
     next()

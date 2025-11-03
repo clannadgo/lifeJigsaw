@@ -210,14 +210,14 @@ export default {
           const response = await addUser(this.formData)
           // 检查响应中是否包含token和用户信息
           if (response.data && response.data.token) {
-            this.$message.success(response.message || '注册成功，正在跳转到首页！')
-            // 有token时直接跳转到首页
-            this.$router.push('/')
+            this.$message.success(response.message || '注册成功，正在跳转到控制台！')
+            // 有token时直接跳转到控制台
+            this.$router.push('/dashboard')
           } else {
-            // 没有token时，提示用户注册成功并跳转到登录页
-            this.$message.success(response.message || '注册成功，请登录！')
+            // 没有token时，提示用户注册成功并跳转到控制台
+            this.$message.success(response.message || '注册成功，正在跳转到控制台！')
             setTimeout(() => {
-              this.$router.push('/login')
+              this.$router.push('/dashboard')
             }, 1500)
           }
       } catch (error) {

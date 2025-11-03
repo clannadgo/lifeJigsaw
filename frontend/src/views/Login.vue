@@ -85,7 +85,7 @@ export default {
           showMessage('登录成功', 'success')
           
           // 获取重定向URL，如果没有则跳转到首页
-          const redirectUrl = router.currentRoute.value.query.redirect || '/'
+          const redirectUrl = router.currentRoute.value.query.redirect || '/dashboard'
           router.push(redirectUrl)
         } else {
           showMessage(response.message || '登录失败，请重试', 'error')
