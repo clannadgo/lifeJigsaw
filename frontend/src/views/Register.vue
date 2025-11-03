@@ -18,6 +18,16 @@
             />
           </div>
           <div class="form-group">
+            <label for="email">邮箱</label>
+            <input
+              type="email"
+              id="email"
+              v-model="formData.email"
+              placeholder="请输入邮箱"
+              required
+            />
+          </div>
+          <div class="form-group">
             <label for="password">密码</label>
             <input
               type="password"
@@ -71,6 +81,7 @@ export default {
     return {
       formData: {
         username: '',
+        email: '',
         password: '',
         familyName: ''
       },
@@ -89,6 +100,13 @@ export default {
       
       if (this.formData.username.length < 2) {
         this.errorMessage = '用户名至少需要2个字符'
+        return
+      }
+      
+      // 邮箱格式验证
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(this.formData.email)) {
+        this.errorMessage = '请输入有效的邮箱地址'
         return
       }
       
