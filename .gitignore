@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# 敏感配置文件
+email.properties
+**/email.properties
