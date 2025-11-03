@@ -29,7 +29,12 @@ public class LifeUserController {
     @Operation(summary = "新增用户")
     @PostMapping("/user/add")
     Response<Integer> addUser(@RequestBody @Validated AddUserQo qo){
-        return Response.success(service.addUser(qo));
+        Integer result = service.addUser(qo);
+        if (result > 0) {
+            return Response.success(result);
+        } else {
+            return Response.error("用户名或家庭名称已存在");
+        }
     }
     
     /**

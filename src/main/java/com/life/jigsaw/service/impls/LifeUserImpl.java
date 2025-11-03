@@ -20,21 +20,36 @@ public class LifeUserImpl implements LifeUserInterface {
 
     @Override
     public Integer addUser(AddUserQo qo) {
+        // 检查用户名是否已存在
+        QueryWrapper<LifeUser> usernameWrapper = new QueryWrapper<>();
+        usernameWrapper.eq("username", qo.getUsername());
+        if (lifeUserMapper.selectOne(usernameWrapper) != null) {
+            return 0; // 用户名已存在
+        }
+        
+        // 检查家庭名称是否已存在
+        String familyName = generateFamilyName(qo.getFamilyName(), qo.getUsername());
+        QueryWrapper<LifeUser> familyNameWrapper = new QueryWrapper<>();
+        familyNameWrapper.eq("family_name", familyName);
+        if (lifeUserMapper.selectOne(familyNameWrapper) != null) {
+            return 0; // 家庭名称已存在
+        }
+        
         LifeUser user = new LifeUser();
         user.setUsername(qo.getUsername());
         // 使用PasswordUtils对密码进行加密
         user.setPassword(PasswordUtils.encode(qo.getPassword()));
         user.setEmail(qo.getEmail());
         user.setPhone(qo.getPhone());
-        user.setFamilyName(generateFamilyName(qo.getFamilyName(), qo.getUsername()));
+        user.setFamilyName(familyName);
         return lifeUserMapper.insert(user);
     }
 
     @Override
     public LifeUser login(LoginQo loginQo) {
-        // 根据用户名查询用户
+        // 根据用户名或家庭名称查询用户
         QueryWrapper<LifeUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", loginQo.getUsername());
+        queryWrapper.eq("username", loginQo.getUsername()).or().eq("family_name", loginQo.getUsername());
         LifeUser user = lifeUserMapper.selectOne(queryWrapper);
         
         // 如果用户不存在，返回null
@@ -101,11 +116,25 @@ public class LifeUserImpl implements LifeUserInterface {
         
         // 检查用户名是否重复（如果用户名变更了）
         if (!user.getUsername().equals(updateUserQo.getUsername())) {
-            QueryWrapper<LifeUser> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("username", updateUserQo.getUsername());
-            LifeUser existingUser = lifeUserMapper.selectOne(queryWrapper);
+            QueryWrapper<LifeUser> usernameWrapper = new QueryWrapper<>();
+            usernameWrapper.eq("username", updateUserQo.getUsername());
+            LifeUser existingUser = lifeUserMapper.selectOne(usernameWrapper);
             if (existingUser != null) {
                 // 用户名已存在，返回false
+                return false;
+            }
+        }
+        
+        // 生成新的家庭名称
+        String newFamilyName = generateFamilyName(updateUserQo.getFamilyName(), updateUserQo.getUsername());
+        
+        // 检查家庭名称是否重复（如果家庭名称变更了）
+        if (!user.getFamilyName().equals(newFamilyName)) {
+            QueryWrapper<LifeUser> familyNameWrapper = new QueryWrapper<>();
+            familyNameWrapper.eq("family_name", newFamilyName);
+            LifeUser existingUser = lifeUserMapper.selectOne(familyNameWrapper);
+            if (existingUser != null) {
+                // 家庭名称已存在，返回false
                 return false;
             }
         }
@@ -113,7 +142,7 @@ public class LifeUserImpl implements LifeUserInterface {
         // 更新用户信息
         user.setUsername(updateUserQo.getUsername());
         user.setPhone(updateUserQo.getPhone());
-        user.setFamilyName(generateFamilyName(updateUserQo.getFamilyName(), updateUserQo.getUsername()));
+        user.setFamilyName(newFamilyName);
         user.setEmail(updateUserQo.getEmail());
         
         // 执行更新操作
