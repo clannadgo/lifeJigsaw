@@ -21,8 +21,8 @@ public class JwtUtils {
     // JWT过期时间（24小时）
     private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000;
     
-    // JWT密钥
-    private static final String SECRET_KEY = "life_jigsaw_secret_key_2024_very_secure";
+    // 使用Keys.secretKeyFor方法生成符合HS512算法要求的安全密钥（至少512位）
+    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     
     /**
      * 生成JWT token
@@ -42,13 +42,13 @@ public class JwtUtils {
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + EXPIRE_TIME);
         
-        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        // 直接使用预先生成的安全密钥
         
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS512)
                 .compact();
     }
     
@@ -58,10 +58,9 @@ public class JwtUtils {
      * @return 解析后的声明
      */
     public static Claims parseToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-        
+        // 直接使用预先生成的安全密钥
         return Jwts.parser()
-                .setSigningKey(key)
+                .setSigningKey(SECRET_KEY)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
