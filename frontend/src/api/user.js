@@ -4,7 +4,7 @@ import request from '../utils/request'
 // 创建一个无认证的axios实例用于公开接口
 const publicRequest = axios.create({
   timeout: 10000,
-  baseURL: '/api/puzzle/v2'
+  baseURL: '' // 使用空baseURL，让路径完全由API函数控制
 })
 
 // 用户登录 - 仍然使用原request，因为可能需要处理token响应
@@ -19,7 +19,7 @@ export const login = (data) => {
 // 发送邮箱验证码 - 使用无认证的axios实例
 export const sendEmailCode = (email) => {
   return publicRequest({
-    url: '/user/sendEmailCode',
+    url: '/api/user/sendEmailCode', // 添加/api前缀，与代理配置匹配
     method: 'post',
     data: { email }
   })
@@ -28,7 +28,7 @@ export const sendEmailCode = (email) => {
 // 新增用户 - 使用无认证的axios实例
 export const addUser = (data) => {
   return publicRequest({
-    url: '/user/add',
+    url: '/api/user/add', // 添加/api前缀，与代理配置匹配
     method: 'post',
     data
   })

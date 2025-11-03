@@ -14,7 +14,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5026', // 后端服务运行在5026端口
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '') // 移除/api前缀，因为axios的baseURL已经包含了/api/puzzle/v2
+        rewrite: (path) => path.replace(/^\/api/, '/api/puzzle/v2') // 正确重写路径，确保包含v2版本号
       }
     },
     port: 3000 // 前端开发服务器端口
