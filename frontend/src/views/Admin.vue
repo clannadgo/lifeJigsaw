@@ -1,10 +1,28 @@
 <template>
   <div class="admin-container">
-    <!-- 管理后台头部 -->
-    <div class="admin-header">
-      <h1>管理后台</h1>
-      <router-link to="/dashboard" class="back-btn">返回首页</router-link>
-    </div>
+    <!-- 管理后台头部 - 家庭风格 -->
+    <header class="family-header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="family-info">
+            <div class="family-icon">🏠</div>
+            <div class="family-details">
+              <h1 class="family-name">温馨家庭</h1>
+              <p class="family-motto">相亲相爱，幸福美满</p>
+            </div>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="admin-title">
+            <h2>管理后台</h2>
+          </div>
+          <router-link to="/dashboard" class="back-btn">
+            <span class="back-icon">🏠</span>
+            <span>返回首页</span>
+          </router-link>
+        </div>
+      </div>
+    </header>
 
     <!-- 侧边导航 -->
     <div class="admin-layout">
@@ -258,34 +276,108 @@ export default {
   background-color: #f5f7fa;
 }
 
-.admin-header {
-  background-color: #4a6fa5;
-  color: white;
-  padding: 20px;
+/* 家庭风格头部样式 */
+.family-header {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  color: #fff;
+  padding: 1rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.family-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 20%, transparent 20%),
+    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.15) 15%, transparent 15%),
+    radial-gradient(circle at 40% 70%, rgba(255, 255, 255, 0.1) 18%, transparent 18%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.12) 12%, transparent 12%);
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 1;
 }
 
-.admin-header h1 {
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.family-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.family-icon {
+  font-size: 2.5rem;
+}
+
+.family-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.family-name {
+  font-size: 1.8rem;
   margin: 0;
-  font-size: 24px;
+  font-weight: 600;
+}
+
+.family-motto {
+  font-size: 0.9rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.admin-title h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 500;
 }
 
 .back-btn {
-  background-color: #ffffff;
-  color: #4a6fa5;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  color: #fff;
   text-decoration: none;
-  font-size: 14px;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .back-btn:hover {
-  background-color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-icon {
+  font-size: 1.1rem;
 }
 
 .admin-layout {
