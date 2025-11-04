@@ -12,7 +12,7 @@ import java.sql.Connection;
 import java.util.Properties;
 
 /**
- * 处理sql中的关键字
+ * 处理SQL中的关键字，适配多数据库类型
  */
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})
@@ -33,11 +33,16 @@ public class MybatisKeyWordInterceptor implements Interceptor {
         String originalSql = boundSql.getSql();
 
         // 根据数据库类型对SQL进行处理
-        if (driverClassName.contains("mysql")) {  //mysql 中 Key 是关键字，需要加反单引号，我们不少表中使用了Key 当字段名
-            //正则含义： 仅当Key前后不是字母和数字和下划线时匹配Key，并将Key 替换成`Key`
+        if (driverClassName.contains("mysql") || driverClassName.contains("mariadb")) {
+            // MySQL/MariaDB 关键字处理：使用反单引号
             originalSql = originalSql.replaceAll("(?<![a-zA-Z0-9_])Key(?![a-zA-Z0-9_])","`Key`")
                     .replaceAll("(?<![a-zA-Z0-9_])Character(?![a-zA-Z0-9_])","`Character`");
+        } else if (driverClassName.contains("sqlite")) {
+            // SQLite 关键字处理：使用双引号
+            originalSql = originalSql.replaceAll("(?<![a-zA-Z0-9_])Key(?![a-zA-Z0-9_])","\"Key\"")
+                    .replaceAll("(?<![a-zA-Z0-9_])Character(?![a-zA-Z0-9_])","\"Character\"");
         }
+        
         // 设置修改后的SQL
         metaObject.setValue("delegate.boundSql.sql", originalSql);
 

@@ -92,7 +92,6 @@ export default {
         }
       } catch (error) {
         console.error('登录失败:', error)
-        showMessage('登录失败，请检查网络连接或稍后重试', 'error')
       } finally {
         loading.value = false
       }

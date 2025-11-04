@@ -1,24 +1,27 @@
 <template>
   <div class="dashboard-container">
-    <!-- 欢迎区域 -->
-    <section class="welcome-section">
+    <!-- 家庭主题头部 -->
+    <FamilyHeader 
+      :familyName="familyName"
+      :userInfo="userInfo"
+      @logout="logout"
+    />
+    
+    <!-- 日期和统计信息区域 -->
+    <div class="stats-bar">
       <div class="container">
-        <div class="welcome-content">
-          <h1 class="welcome-title">欢迎回来，{{ userInfo?.username }}</h1>
-          <p class="welcome-subtitle">{{ familyName }}</p>
-          <div class="welcome-stats">
-            <div class="stat-item">
-              <span class="stat-value">{{ currentDate }}</span>
-              <span class="stat-label">今日日期</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-value">{{ daysSinceJoin }}</span>
-              <span class="stat-label">加入天数</span>
-            </div>
+        <div class="stats-content">
+          <div class="stat-item">
+            <span class="stat-label">今日日期</span>
+            <span class="stat-value">{{ currentDate }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">加入天数</span>
+            <span class="stat-value">{{ daysSinceJoin }}</span>
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
     <!-- 内容网格 -->
     <div class="container dashboard-grid">
@@ -155,8 +158,13 @@
 </template>
 
 <script>
+import FamilyHeader from '../components/FamilyHeader.vue'
+
 export default {
   name: 'Dashboard',
+  components: {
+    FamilyHeader
+  },
   data() {
     return {
       userInfo: null,
@@ -357,6 +365,14 @@ export default {
     addPuzzlePiece() {
       this.$message.info('拼图添加功能开发中...')
       // 实际项目中应该打开添加拼图的弹窗
+    },
+    logout() {
+      if (confirm('确定要退出登录吗？')) {
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+        this.$router.push('/login')
+        this.$message.success('已成功退出登录')
+      }
     }
   }
 }
@@ -368,36 +384,35 @@ export default {
   background-color: var(--background-color);
 }
 
-/* 欢迎区域 */
-.welcome-section {
-  background: linear-gradient(135deg, var(--primary-color), #6B8CB5);
-  color: white;
-  padding: 40px 0;
+/* 统计信息栏 */
+.stats-bar {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
 }
 
-.welcome-content {
+.stats-content {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+}
+
+.stats-bar .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  gap: 0.25rem;
 }
 
-.welcome-title {
-  font-size: 2.5rem;
-  margin-bottom: 8px;
-  font-weight: 700;
+.stats-bar .stat-label {
+  font-size: 0.9rem;
+  color: var(--light-text);
 }
 
-.welcome-subtitle {
+.stats-bar .stat-value {
   font-size: 1.2rem;
-  margin-bottom: 30px;
-  opacity: 0.9;
-}
-
-.welcome-stats {
-  display: flex;
-  gap: 40px;
-  margin-top: 20px;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .stat-item {

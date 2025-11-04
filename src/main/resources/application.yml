@@ -36,7 +36,12 @@ spring:
     active: dev  # 使用的配置文件
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   cache:
     type: caffeine # 默认使用caffeine缓存
   datasource:   # 数据源配置
@@ -91,7 +96,14 @@ spring:
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
-  # 文件上传
+  # SQLite特殊配置
+    hikari:
+      connection-test-query: SELECT 1
+      minimum-idle: 1
+      maximum-pool-size: 10
+      idle-timeout: 600000
+      connection-timeout: 30000
+    # 文件上传
   servlet:
     multipart:
       # 单个文件大小
