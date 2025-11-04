@@ -123,7 +123,8 @@ export default {
           if (userInfo.isAdmin === undefined) {
             console.log('loadUserInfo - isAdmin为undefined，设置为false');
             userInfo.isAdmin = false;
-          } else if (typeof userInfo.isAdmin !== 'boolean') {
+          }
+          if (typeof userInfo.isAdmin !== 'boolean') {
             console.log('loadUserInfo - isAdmin类型错误，转换为布尔值:', userInfo.isAdmin);
             userInfo.isAdmin = Boolean(userInfo.isAdmin);
           }
