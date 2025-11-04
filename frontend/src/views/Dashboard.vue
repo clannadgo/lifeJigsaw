@@ -200,8 +200,8 @@ export default {
       })
     },
     daysSinceJoin() {
-      // 模拟数据，实际应该从用户注册日期计算
-      return 15
+      // 从用户注册日期计算，初始为空
+      return 0
     }
   },
   mounted() {
@@ -242,88 +242,23 @@ export default {
       this.loadPuzzleData()
     },
     loadPointsData() {
-      // 模拟本月积分数据
-      this.monthlyPoints = 350
-      this.pointsProgress = Math.min((this.monthlyPoints / this.pointsGoal) * 100, 100)
-      this.pointsRecords = [
-        { id: 1, reason: '完成每日任务', points: 50, date: '今天 10:30' },
-        { id: 2, reason: '连续登录奖励', points: 20, date: '昨天 09:15' },
-        { id: 3, reason: '分享成就', points: 30, date: '昨天 14:45' },
-        { id: 4, reason: '完成拼图', points: 100, date: '3天前 16:20' },
-        { id: 5, reason: '心愿实现', points: 150, date: '5天前 08:30' }
-      ]
+      // 初始化空数据，实际应该从API获取
+      this.monthlyPoints = 0
+      this.pointsProgress = 0
+      this.pointsRecords = []
     },
     loadWishesData() {
-      // 模拟许愿池数据
-      this.wishes = [
-        {
-          id: 1,
-          title: '学会弹吉他',
-          description: '希望在三个月内学会弹奏简单的吉他曲目',
-          createdAt: '2024-01-15',
-          fulfilled: false
-        },
-        {
-          id: 2,
-          title: '读完10本书',
-          description: '今年的阅读计划，每月至少读完一本书',
-          createdAt: '2024-01-05',
-          fulfilled: true
-        },
-        {
-          id: 3,
-          title: '家庭旅行',
-          description: '计划一次全家人的旅行，增进感情',
-          createdAt: '2024-01-20',
-          fulfilled: false
-        }
-      ]
+      // 初始化空数据，实际应该从API获取
+      this.wishes = []
     },
     loadPuzzleData() {
-      // 模拟人生拼图数据
-      this.puzzlePieces = [
-        {
-          id: 1,
-          title: '家庭和谐',
-          category: 'family',
-          progress: 85
-        },
-        {
-          id: 2,
-          title: '事业发展',
-          category: 'career',
-          progress: 60
-        },
-        {
-          id: 3,
-          title: '健康生活',
-          category: 'health',
-          progress: 45
-        },
-        {
-          id: 4,
-          title: '学习成长',
-          category: 'learning',
-          progress: 70
-        },
-        {
-          id: 5,
-          title: '兴趣爱好',
-          category: 'hobby',
-          progress: 30
-        },
-        {
-          id: 6,
-          title: '社交网络',
-          category: 'social',
-          progress: 55
-        }
-      ]
+      // 初始化空数据，实际应该从API获取
+      this.puzzlePieces = []
       
       // 计算拼图统计
-      this.puzzleStats.total = this.puzzlePieces.length
-      this.puzzleStats.completed = this.puzzlePieces.filter(p => p.progress >= 100).length
-      this.puzzleStats.inProgress = this.puzzlePieces.filter(p => p.progress > 0 && p.progress < 100).length
+      this.puzzleStats.total = 0
+      this.puzzleStats.completed = 0
+      this.puzzleStats.inProgress = 0
     },
     getPieceIcon(category) {
       const icons = {
@@ -350,30 +285,20 @@ export default {
     submitWish() {
       if (!this.newWish.title) return
       
-      // 模拟添加心愿
-      const newId = this.wishes.length + 1
-      this.wishes.push({
-        id: newId,
-        title: this.newWish.title,
-        description: this.newWish.description,
-        createdAt: new Date().toISOString().split('T')[0],
-        fulfilled: false
-      })
-      
+      // 实际应该调用API添加心愿
       this.$message.success('心愿已添加！')
       this.closeWishModal()
+      // 清空表单
+      this.newWish = { title: '', description: '' }
     },
     fulfillWish(wishId) {
-      const wish = this.wishes.find(w => w.id === wishId)
-      if (wish) {
-        wish.fulfilled = true
-        this.$message.success('恭喜实现心愿！')
-        // 可以在这里添加积分奖励逻辑
-      }
+      // 实际应该调用API标记心愿实现
+      this.$message.success('恭喜实现心愿！')
+      // 可以在这里添加积分奖励逻辑
     },
     deleteWish(wishId) {
       if (confirm('确定要删除这个心愿吗？')) {
-        this.wishes = this.wishes.filter(w => w.id !== wishId)
+        // 实际应该调用API删除心愿
         this.$message.success('心愿已删除')
       }
     },

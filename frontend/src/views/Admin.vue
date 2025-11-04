@@ -179,27 +179,16 @@ export default {
         { key: 'extendedActivities', label: '扩展活动' }
       ],
       activeScoreTab: 'dailyTasks',
-      // 模拟数据
-      dailyTasks: [
-        { id: 1, taskName: '晨读英语', description: '每天早晨阅读英语15分钟', scoreValue: 5, taskType: '学习', status: 1 },
-        { id: 2, taskName: '体育锻炼', description: '每天进行30分钟体育锻炼', scoreValue: 8, taskType: '健康', status: 1 },
-        { id: 3, taskName: '做家务', description: '帮助家人完成家务', scoreValue: 3, taskType: '生活', status: 1 }
-      ],
-      academicTrackings: [
-        { id: 1, projectName: '数学作业', description: '完成每日数学作业', scoreValue: 10, trackingType: '作业', status: 1 },
-        { id: 2, projectName: '阅读计划', description: '每周阅读一本课外书', scoreValue: 15, trackingType: '阅读', status: 1 }
-      ],
-      extendedActivities: [
-        { id: 1, activityName: '志愿者活动', description: '参与社区志愿者活动', scoreValue: 20, activityType: '公益', status: 1 },
-        { id: 2, activityName: '兴趣小组', description: '参加兴趣小组活动', scoreValue: 12, activityType: '兴趣', status: 1 }
-      ]
+      // 初始化为空数组，实际应该从API获取
+      dailyTasks: [],
+      academicTrackings: [],
+      extendedActivities: []
     }
   },
   mounted() {
-    // 检查用户权限
-    this.checkAdminPermission()
-    // 后续可以从API加载数据
-  },
+      // 检查用户权限
+      this.checkAdminPermission()
+    },
   methods: {
     checkAdminPermission() {
       const userStr = localStorage.getItem('user')
@@ -229,8 +218,8 @@ export default {
     },
     deleteDailyTask(id) {
       if (confirm('确定要删除这个每日任务吗？')) {
+        // 实际应该调用API删除任务
         this.$message.success('每日任务删除成功')
-        // 后续实现删除功能
       }
     },
     // 学业追踪相关方法
@@ -244,8 +233,8 @@ export default {
     },
     deleteAcademicTracking(id) {
       if (confirm('确定要删除这个学业追踪项目吗？')) {
+        // 实际应该调用API删除项目
         this.$message.success('学业追踪项目删除成功')
-        // 后续实现删除功能
       }
     },
     // 扩展活动相关方法
@@ -259,8 +248,8 @@ export default {
     },
     deleteExtendedActivity(id) {
       if (confirm('确定要删除这个扩展活动吗？')) {
+        // 实际应该调用API删除活动
         this.$message.success('扩展活动删除成功')
-        // 后续实现删除功能
       }
     }
   }
