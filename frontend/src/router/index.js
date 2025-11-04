@@ -53,6 +53,15 @@ const routes = [
       requiresAuth: true
     }
   },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('../views/Admin.vue'),
+    meta: {
+      title: '人生拼图 - 管理后台',
+      requiresAuth: true
+    }
+  },
   // 捕获所有未匹配的路由，重定向到首页
   {
     path: '/:pathMatch(.*)*',

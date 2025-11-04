@@ -14,6 +14,7 @@
         <div class="user-info">
           <div v-if="userInfo">
             <span class="family-name">{{ userInfo.familyName }}</span>
+            <router-link to="/admin" v-if="userInfo.isAdmin" class="admin-btn">管理后台</router-link>
             <button class="logout-btn" @click="handleLogout">退出登录</button>
           </div>
           <div v-else>
@@ -129,6 +130,22 @@ export default {
   padding: 8px 16px;
   background-color: rgba(255,255,255,0.2);
   border-radius: 20px;
+}
+
+.admin-btn {
+  background-color: #4ecdc4;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.admin-btn:hover {
+  background-color: #45b7aa;
 }
 
 .logout-btn {
