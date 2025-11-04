@@ -20,4 +20,7 @@ public class LifeUser extends BaseEntity{
     // 邮箱验证相关字段
     private Boolean emailVerified = false; // 邮箱是否已验证
     private String verificationToken; // 邮箱验证令牌
+    
+    // 权限相关字段
+    private Boolean isAdmin = false; // 是否为管理员
 }
