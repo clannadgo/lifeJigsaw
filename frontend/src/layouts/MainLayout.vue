@@ -178,6 +178,7 @@ export default {
       console.log('===== handleLogout 结束 =====')
     }
   }
+  }
 </script>
 
 <style scoped>

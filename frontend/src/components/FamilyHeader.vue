@@ -13,6 +13,7 @@
       <div class="header-right">
         <div class="user-info" v-if="userInfo">
           <span class="username">{{ userInfo.username }}</span>
+          <router-link to="/admin" v-if="userInfo.isAdmin" class="admin-btn">管理后台</router-link>
         </div>
         <button class="logout-btn" @click="handleLogout">
           <span class="logout-icon">👋</span>
@@ -142,6 +143,23 @@ export default {
   padding: 0.5rem 1rem;
   border-radius: 20px;
   backdrop-filter: blur(10px);
+  gap: 1rem;
+}
+
+.admin-btn {
+  background-color: #4ecdc4;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #45b7aa;
 }
 
 .username {
