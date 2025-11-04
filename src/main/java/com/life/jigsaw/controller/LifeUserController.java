@@ -79,10 +79,19 @@ public class LifeUserController {
                 // 生成JWT token
                 String token = JwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName());
                 
-                // 构建响应数据
+                // 构建响应数据，确保isAdmin字段被正确包含
                 Map<String, Object> data = new HashMap<>();
                 data.put("token", token);
-                data.put("user", user);
+                
+                // 创建一个包含所有必要信息的Map
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("id", user.getId());
+                userInfo.put("username", user.getUsername());
+                userInfo.put("familyName", user.getFamilyName());
+                userInfo.put("isAdmin", user.getIsAdmin() != null ? user.getIsAdmin() : false);
+                userInfo.put("emailVerified", user.getEmailVerified());
+                
+                data.put("user", userInfo);
                 
                 return Response.success(data, "注册成功");
             } else {
