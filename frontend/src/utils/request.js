@@ -1,6 +1,21 @@
 import axios from 'axios'
 import { showMessage } from './message.js'
 
+// 解析JWT token函数
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error('解析token失败:', e);
+    return null;
+  }
+}
+
 // 创建axios实例 - 用于需要认证的接口
 const service = axios.create({
   timeout: 10000, // 请求超时时间
@@ -117,6 +132,12 @@ service.interceptors.response.use(
     if (res.data && res.data.token) {
       localStorage.setItem('token', res.data.token)
       if (res.data.user) {
+        // 从token中解析isAdmin信息
+        const tokenData = parseJwt(res.data.token);
+        if (tokenData && tokenData.isAdmin !== undefined) {
+          // 使用token中的isAdmin字段更新用户信息
+          res.data.user.isAdmin = tokenData.isAdmin;
+        }
         localStorage.setItem('user', JSON.stringify(res.data.user))
       }
     }

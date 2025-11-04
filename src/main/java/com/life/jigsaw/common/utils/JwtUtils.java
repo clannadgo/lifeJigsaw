@@ -29,14 +29,16 @@ public class JwtUtils {
      * @param userId 用户ID
      * @param username 用户名
      * @param familyName 家庭名称
+     * @param isAdmin 是否为管理员
      * @return JWT token
      */
-    public static String generateToken(Long userId, String username, String familyName) {
+    public static String generateToken(Long userId, String username, String familyName, Boolean isAdmin) {
         // 创建JWT声明
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
         claims.put("familyName", familyName);
+        claims.put("isAdmin", isAdmin != null ? isAdmin : false);
         
         // 生成JWT token
         Date now = new Date();
@@ -108,5 +110,15 @@ public class JwtUtils {
     public static String getFamilyNameFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.get("familyName", String.class);
+    }
+    
+    /**
+     * 从JWT token中获取是否为管理员
+     * @param token JWT token
+     * @return 是否为管理员
+     */
+    public static Boolean getIsAdminFromToken(String token) {
+        Claims claims = parseToken(token);
+        return claims.get("isAdmin", Boolean.class) != null ? claims.get("isAdmin", Boolean.class) : false;
     }
 }

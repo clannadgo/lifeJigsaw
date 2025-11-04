@@ -79,10 +79,14 @@ public class SecurityConfig {
                     try {
                         // 获取token中的用户信息
                         Long userId = JwtUtils.getUserIdFromToken(token);
+                        Boolean isAdmin = JwtUtils.getIsAdminFromToken(token);
                         
                         // 从数据库中获取用户信息
                         LifeUser user = lifeUserService.findById(userId);
                         if (user != null) {
+                            // 从token中更新isAdmin信息
+                            user.setIsAdmin(isAdmin);
+                            
                             // 创建认证对象
                             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                     user, null, new ArrayList<>());
