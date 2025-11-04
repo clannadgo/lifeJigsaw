@@ -53,6 +53,15 @@ function setupResponseInterceptor(instance) {
       if (res.data && res.data.token) {
         localStorage.setItem('token', res.data.token)
         if (res.data.user) {
+          // 从token中解析isAdmin信息
+          const tokenData = parseJwt(res.data.token);
+          if (tokenData && tokenData.isAdmin !== undefined) {
+            // 使用token中的isAdmin字段更新用户信息
+            res.data.user.isAdmin = tokenData.isAdmin;
+          } else {
+            // 确保isAdmin字段存在，默认为false
+            res.data.user.isAdmin = res.data.user.isAdmin || false;
+          }
           localStorage.setItem('user', JSON.stringify(res.data.user))
         }
       }
@@ -136,6 +145,9 @@ service.interceptors.response.use(
         if (tokenData && tokenData.isAdmin !== undefined) {
           // 使用token中的isAdmin字段更新用户信息
           res.data.user.isAdmin = tokenData.isAdmin;
+        } else {
+          // 确保isAdmin字段存在，默认为false
+          res.data.user.isAdmin = res.data.user.isAdmin || false;
         }
         localStorage.setItem('user', JSON.stringify(res.data.user))
       }
