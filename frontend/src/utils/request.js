@@ -140,40 +140,30 @@ service.interceptors.response.use(
     if (res.hasOwnProperty('isSuccess')) {
       if (!res.isSuccess) {
         // isSuccess为false时，显示错误信息
-        console.error('响应错误:', res.message)
         showMessage(res.message || '请求失败', 'error')
         return Promise.reject(new Error(res.message || '请求失败'))
       }
     } else if (res.code && res.code !== '0000' && res.code !== 200) {
       // 兼容旧的code判断逻辑
-      console.error('响应错误:', res.message)
       showMessage(res.message || '请求失败', 'error')
       return Promise.reject(new Error(res.message || '请求失败'))
     }
     
     // 请求成功，处理token和用户信息
-    console.log('service拦截器 - 处理响应中的token和用户信息...');
     if (res.data && res.data.token) {
-      console.log('service拦截器 - 响应中包含token，开始处理...');
       localStorage.setItem('token', res.data.token)
       if (res.data.user) {
-        console.log('service拦截器 - 响应中包含用户信息，原始user对象:', res.data.user);
         // 从token中解析isAdmin信息
         const tokenData = parseJwt(res.data.token);
         if (tokenData && tokenData.isAdmin !== undefined) {
           console.log('service拦截器 - 从token中获取到isAdmin值:', tokenData.isAdmin);
           // 使用token中的isAdmin字段更新用户信息
           res.data.user.isAdmin = tokenData.isAdmin;
-          console.log('service拦截器 - 更新后user对象中的isAdmin值:', res.data.user.isAdmin);
         } else {
-          console.log('service拦截器 - token中未找到isAdmin字段，确保isAdmin默认存在');
           // 确保isAdmin字段存在，默认为false
           res.data.user.isAdmin = res.data.user.isAdmin || false;
-          console.log('service拦截器 - 设置默认isAdmin值后:', res.data.user.isAdmin);
         }
-        console.log('service拦截器 - 保存到localStorage前的最终user对象:', res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user))
-        console.log('service拦截器 - 已成功保存用户信息到localStorage');
       }
     } else {
       console.log('service拦截器 - 响应中不包含token或res.data不存在');

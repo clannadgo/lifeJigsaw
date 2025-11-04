@@ -7,15 +7,11 @@
           <div class="family-info">
             <div class="family-icon">🏠</div>
             <div class="family-details">
-              <h1 class="family-name">温馨家庭</h1>
-              <p class="family-motto">相亲相爱，幸福美满</p>
+              <h1 class="family-name">{{ familyName }}</h1>
             </div>
           </div>
         </div>
         <div class="header-right">
-          <div class="admin-title">
-            <h2>管理后台</h2>
-          </div>
           <router-link to="/dashboard" class="back-btn">
             <span class="back-icon">🏠</span>
             <span>返回首页</span>
@@ -175,6 +171,7 @@ export default {
   name: 'Admin',
   data() {
     return {
+      familyName: '温馨家庭',
       activeModule: 'scores',
       scoreTabs: [
         { key: 'dailyTasks', label: '每日任务' },
