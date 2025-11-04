@@ -13,16 +13,13 @@
         <!-- 右侧用户信息或登录按钮 -->
         <div class="user-info">
           <div v-if="userInfo">
-            {{ console.log('模板渲染 - userInfo存在，isAdmin值:', userInfo.isAdmin) }}
             <router-link to="/dashboard" class="family-name-link">
               <span class="family-name">{{ userInfo.familyName }}</span>
             </router-link>
             <router-link to="/admin" v-if="userInfo.isAdmin" class="admin-btn">管理后台</router-link>
-            {{ userInfo.isAdmin ? console.log('模板渲染 - isAdmin为true，应显示管理后台按钮') : console.log('模板渲染 - isAdmin为false或不存在，不显示管理后台按钮') }}
             <button class="logout-btn" @click="handleLogout">退出登录</button>
           </div>
           <div v-else>
-            {{ console.log('模板渲染 - userInfo不存在，显示登录注册按钮') }}
             <router-link to="/login" class="login-btn">登录</router-link>
             <router-link to="/register" class="register-btn">注册</router-link>
           </div>
@@ -75,7 +72,8 @@ export default {
         console.log('watch - 新userInfo.isAdmin值:', newVal?.isAdmin)
       },
       deep: true
-    },
+    }
+  },
   methods: {
     initializeUserInfo() {
       console.log('===== initializeUserInfo 开始 =====')
@@ -149,7 +147,6 @@ export default {
       }
       console.log('===== loadUserInfo 结束 ===== 最终userInfo:', JSON.stringify(this.userInfo))
     },
-    },
     handleStorageChange(event) {
       console.log('===== handleStorageChange 开始 =====')
       console.log('storage事件key:', event.key)
@@ -180,7 +177,6 @@ export default {
       console.log('===== handleLogout 结束 =====')
     }
   }
-}
 </script>
 
 <style scoped>
