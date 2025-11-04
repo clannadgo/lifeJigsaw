@@ -39,34 +39,77 @@ export default {
   name: 'MainLayout',
   data() {
     return {
-      userInfo: null
+      userInfo: this.initializeUserInfo()
     }
   },
-  mounted() {
-    // 初始化时从localStorage获取用户信息
-    this.loadUserInfo()
-    
+  created() {
+    console.log('created钩子执行 - 初始化后this.userInfo:', this.userInfo)
     // 监听storage事件，当localStorage中的用户信息发生变化时更新
     window.addEventListener('storage', this.handleStorageChange)
+  },
+  mounted() {
+    console.log('mounted钩子执行前 - this.userInfo:', this.userInfo)
+    // 组件挂载后再次确认用户信息是否正确
+    this.loadUserInfo()
+    console.log('mounted钩子执行后 - this.userInfo:', this.userInfo)
   },
   beforeUnmount() {
     // 移除事件监听
     window.removeEventListener('storage', this.handleStorageChange)
   },
   methods: {
-    loadUserInfo() {
+    initializeUserInfo() {
+      console.log('开始初始化用户信息...')
+      // 在data初始化时就尝试从localStorage获取用户信息
       const userStr = localStorage.getItem('user')
+      console.log('localStorage中的user数据:', userStr)
       if (userStr) {
         try {
-          this.userInfo = JSON.parse(userStr)
+          const userInfo = JSON.parse(userStr)
+          console.log('解析后的用户信息:', userInfo)
+          console.log('用户信息中的isAdmin字段值:', userInfo.isAdmin)
+          // 确保isAdmin字段存在
+          if (userInfo.isAdmin === undefined) {
+            console.log('isAdmin字段不存在，设置为false')
+            userInfo.isAdmin = false
+          }
+          console.log('返回初始化后的用户信息:', userInfo)
+          return userInfo
         } catch (e) {
-          console.error('解析用户信息失败:', e)
+          console.error('初始化用户信息失败:', e)
+        }
+      }
+      console.log('localStorage中没有用户信息，返回null')
+      return null
+    },
+    loadUserInfo() {
+      console.log('开始加载用户信息...')
+      const userStr = localStorage.getItem('user')
+      console.log('loadUserInfo - localStorage中的user数据:', userStr)
+      if (userStr) {
+        try {
+          const userInfo = JSON.parse(userStr)
+          console.log('loadUserInfo - 解析后的用户信息:', userInfo)
+          console.log('loadUserInfo - 用户信息中的isAdmin字段值:', userInfo.isAdmin)
+          // 确保isAdmin字段存在
+          if (userInfo.isAdmin === undefined) {
+            console.log('loadUserInfo - isAdmin字段不存在，设置为false')
+            userInfo.isAdmin = false
+          }
+          this.userInfo = userInfo
+          console.log('loadUserInfo - 更新后的this.userInfo:', this.userInfo)
+        } catch (e) {
+          console.error('loadUserInfo - 解析用户信息失败:', e)
           this.userInfo = null
         }
+      } else {
+        console.log('loadUserInfo - localStorage中没有用户信息')
       }
     },
     handleStorageChange(event) {
+      console.log('storage事件触发:', event.key, event.newValue)
       if (event.key === 'user') {
+        console.log('用户信息发生变化，重新加载...')
         this.loadUserInfo()
       }
     },

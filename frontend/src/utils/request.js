@@ -3,13 +3,17 @@ import { showMessage } from './message.js'
 
 // 解析JWT token函数
 function parseJwt(token) {
+  console.log('开始解析token:', token ? 'token存在' : 'token不存在');
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
-    return JSON.parse(jsonPayload);
+    const parsedToken = JSON.parse(jsonPayload);
+    console.log('token解析结果:', parsedToken);
+    console.log('token中的isAdmin字段值:', parsedToken.isAdmin);
+    return parsedToken;
   } catch (e) {
     console.error('解析token失败:', e);
     return null;
@@ -50,20 +54,31 @@ function setupResponseInterceptor(instance) {
       }
       
       // 请求成功，处理token和用户信息
+      console.log('处理响应中的token和用户信息...');
       if (res.data && res.data.token) {
+        console.log('响应中包含token，开始处理...');
         localStorage.setItem('token', res.data.token)
         if (res.data.user) {
+          console.log('响应中包含用户信息，原始user对象:', res.data.user);
           // 从token中解析isAdmin信息
           const tokenData = parseJwt(res.data.token);
           if (tokenData && tokenData.isAdmin !== undefined) {
+            console.log('从token中获取到isAdmin值:', tokenData.isAdmin);
             // 使用token中的isAdmin字段更新用户信息
             res.data.user.isAdmin = tokenData.isAdmin;
+            console.log('更新后user对象中的isAdmin值:', res.data.user.isAdmin);
           } else {
+            console.log('token中未找到isAdmin字段，确保isAdmin默认存在');
             // 确保isAdmin字段存在，默认为false
             res.data.user.isAdmin = res.data.user.isAdmin || false;
+            console.log('设置默认isAdmin值后:', res.data.user.isAdmin);
           }
+          console.log('保存到localStorage前的最终user对象:', res.data.user);
           localStorage.setItem('user', JSON.stringify(res.data.user))
+          console.log('已成功保存用户信息到localStorage');
         }
+      } else {
+        console.log('响应中不包含token或res.data不存在');
       }
       return res
     },
@@ -137,20 +152,31 @@ service.interceptors.response.use(
     }
     
     // 请求成功，处理token和用户信息
+    console.log('service拦截器 - 处理响应中的token和用户信息...');
     if (res.data && res.data.token) {
+      console.log('service拦截器 - 响应中包含token，开始处理...');
       localStorage.setItem('token', res.data.token)
       if (res.data.user) {
+        console.log('service拦截器 - 响应中包含用户信息，原始user对象:', res.data.user);
         // 从token中解析isAdmin信息
         const tokenData = parseJwt(res.data.token);
         if (tokenData && tokenData.isAdmin !== undefined) {
+          console.log('service拦截器 - 从token中获取到isAdmin值:', tokenData.isAdmin);
           // 使用token中的isAdmin字段更新用户信息
           res.data.user.isAdmin = tokenData.isAdmin;
+          console.log('service拦截器 - 更新后user对象中的isAdmin值:', res.data.user.isAdmin);
         } else {
+          console.log('service拦截器 - token中未找到isAdmin字段，确保isAdmin默认存在');
           // 确保isAdmin字段存在，默认为false
           res.data.user.isAdmin = res.data.user.isAdmin || false;
+          console.log('service拦截器 - 设置默认isAdmin值后:', res.data.user.isAdmin);
         }
+        console.log('service拦截器 - 保存到localStorage前的最终user对象:', res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user))
+        console.log('service拦截器 - 已成功保存用户信息到localStorage');
       }
+    } else {
+      console.log('service拦截器 - 响应中不包含token或res.data不存在');
     }
     return res
   },
