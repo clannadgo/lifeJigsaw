@@ -146,7 +146,7 @@ export default {
         this.userInfo = {};
       }
       console.log('===== loadUserInfo 结束 ===== 最终userInfo:', JSON.stringify(this.userInfo));
-    },
+    }
     handleStorageChange(event) {
       console.log('===== handleStorageChange 开始 =====')
       console.log('storage事件key:', event.key)
