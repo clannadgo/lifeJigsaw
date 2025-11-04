@@ -58,6 +58,7 @@ public class LifeUserImpl implements LifeUserInterface {
         user.setPhone(qo.getPhone());
         user.setFamilyName(familyName);
         user.setEmailVerified(true); // 验证码验证成功，直接设为已验证
+        user.setIsAdmin(true); // 确保用户注册时默认为管理员
         
         int result = lifeUserMapper.insert(user);
         
