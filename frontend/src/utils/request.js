@@ -87,8 +87,7 @@ function setupResponseInterceptor(instance) {
   )
 }
 
-// 设置拦截器
-setupResponseInterceptor(service)
+// 设置publicRequest的响应拦截器
 setupResponseInterceptor(publicRequest)
 
 // request拦截器 - 用于需要认证的接口
@@ -108,7 +107,7 @@ service.interceptors.request.use(
   }
 )
 
-// respone拦截器
+// 优化后的service响应拦截器
 service.interceptors.response.use(
   response => {
     const res = response.data
