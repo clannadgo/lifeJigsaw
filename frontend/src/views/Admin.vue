@@ -171,7 +171,7 @@ export default {
   name: 'Admin',
   data() {
     return {
-      familyName: '温馨家庭',
+      familyName: '',
       activeModule: 'scores',
       scoreTabs: [
         { key: 'dailyTasks', label: '每日任务' },
@@ -188,6 +188,8 @@ export default {
   mounted() {
       // 检查用户权限
       this.checkAdminPermission()
+      // 从localStorage获取家庭名称
+      this.loadFamilyName()
     },
   methods: {
     checkAdminPermission() {
@@ -205,6 +207,20 @@ export default {
         }
       } else {
         this.$router.push('/login')
+      }
+    },
+    loadFamilyName() {
+      const userStr = localStorage.getItem('user')
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr)
+          this.familyName = user.familyName || '家庭'
+        } catch (e) {
+          console.error('解析用户信息失败:', e)
+          this.familyName = '家庭'
+        }
+      } else {
+        this.familyName = '家庭'
       }
     },
     // 每日任务相关方法
