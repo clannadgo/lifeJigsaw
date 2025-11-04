@@ -13,7 +13,9 @@
         <!-- 右侧用户信息或登录按钮 -->
         <div class="user-info">
           <div v-if="userInfo">
-            <span class="family-name">{{ userInfo.familyName }}</span>
+            <router-link to="/dashboard" class="family-name-link">
+              <span class="family-name">{{ userInfo.familyName }}</span>
+            </router-link>
             <router-link to="/admin" v-if="userInfo.isAdmin" class="admin-btn">管理后台</router-link>
             <button class="logout-btn" @click="handleLogout">退出登录</button>
           </div>
@@ -124,12 +126,25 @@ export default {
   gap: 20px;
 }
 
+.family-name-link {
+  text-decoration: none;
+}
+
 .family-name {
   font-size: 16px;
   font-weight: 500;
   padding: 8px 16px;
   background-color: rgba(255,255,255,0.2);
   border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.family-name:hover {
+  color: #e8f4fd;
+  text-decoration: underline;
+  background-color: rgba(255,255,255,0.3);
 }
 
 .admin-btn {
