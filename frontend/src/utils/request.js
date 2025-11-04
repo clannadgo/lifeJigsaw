@@ -19,24 +19,29 @@ function setupResponseInterceptor(instance) {
     response => {
       const res = response.data
       
-      // 统一的响应成功判断逻辑
-      if (res.code && res.code !== '0000' && res.code !== 200) {
-        // 错误处理逻辑
+      // 优先以isSuccess字段为准判断请求是否成功
+      if (res.hasOwnProperty('isSuccess')) {
+        if (!res.isSuccess) {
+          // isSuccess为false时，显示错误信息
+          console.error('响应错误:', res.message)
+          showMessage(res.message || '请求失败', 'error')
+          return Promise.reject(new Error(res.message || '请求失败'))
+        }
+      } else if (res.code && res.code !== '0000' && res.code !== 200) {
+        // 兼容旧的code判断逻辑
         console.error('响应错误:', res.message)
-        // 显示错误提示
         showMessage(res.message || '请求失败', 'error')
         return Promise.reject(new Error(res.message || '请求失败'))
-      } else {
-        // 如果响应中包含token，保存到localStorage
-        if (res.data && res.data.token) {
-          localStorage.setItem('token', res.data.token)
-          // 保存用户信息
-          if (res.data.user) {
-            localStorage.setItem('user', JSON.stringify(res.data.user))
-          }
-        }
-        return res
       }
+      
+      // 请求成功，处理token和用户信息
+      if (res.data && res.data.token) {
+        localStorage.setItem('token', res.data.token)
+        if (res.data.user) {
+          localStorage.setItem('user', JSON.stringify(res.data.user))
+        }
+      }
+      return res
     },
     error => {
       // 优化错误信息显示
@@ -93,25 +98,29 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     
-    // 根据后端返回的数据格式，这里可以做统一的错误处理
-    // 假设后端返回的数据格式为 { code: 200, message: 'success', data: {} }
-    if (res.code && res.code !== '0000' && res.code !== 200) {
-      // 错误处理逻辑
+    // 优先以isSuccess字段为准判断请求是否成功
+    if (res.hasOwnProperty('isSuccess')) {
+      if (!res.isSuccess) {
+        // isSuccess为false时，显示错误信息
+        console.error('响应错误:', res.message)
+        showMessage(res.message || '请求失败', 'error')
+        return Promise.reject(new Error(res.message || '请求失败'))
+      }
+    } else if (res.code && res.code !== '0000' && res.code !== 200) {
+      // 兼容旧的code判断逻辑
       console.error('响应错误:', res.message)
-      // 显示错误提示
       showMessage(res.message || '请求失败', 'error')
       return Promise.reject(new Error(res.message || '请求失败'))
-    } else {
-      // 如果响应中包含token，保存到localStorage
-      if (res.data && res.data.token) {
-        localStorage.setItem('token', res.data.token)
-        // 保存用户信息
-        if (res.data.user) {
-          localStorage.setItem('user', JSON.stringify(res.data.user))
-        }
-      }
-      return res
     }
+    
+    // 请求成功，处理token和用户信息
+    if (res.data && res.data.token) {
+      localStorage.setItem('token', res.data.token)
+      if (res.data.user) {
+        localStorage.setItem('user', JSON.stringify(res.data.user))
+      }
+    }
+    return res
   },
   error => {
     // 优化错误信息显示
