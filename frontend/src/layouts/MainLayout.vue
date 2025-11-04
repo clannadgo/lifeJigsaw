@@ -104,48 +104,48 @@ export default {
       return {}
     },
     loadUserInfo() {
-      console.log('===== loadUserInfo 开始 =====')
-      const userStr = localStorage.getItem('user')
-      console.log('loadUserInfo - localStorage.user原始值:', userStr)
+      console.log('===== loadUserInfo 开始 =====');
+      const userStr = localStorage.getItem('user');
+      console.log('loadUserInfo - localStorage.user原始值:', userStr);
       
       // 额外检查token
-      const token = localStorage.getItem('token')
-      console.log('loadUserInfo - localStorage.token存在:', !!token)
+      const token = localStorage.getItem('token');
+      console.log('loadUserInfo - localStorage.token存在:', !!token);
       
       if (userStr) {
         try {
-          const userInfo = JSON.parse(userStr)
-          console.log('loadUserInfo - 解析后的完整userInfo:', JSON.stringify(userInfo))
-          console.log('loadUserInfo - userInfo.isAdmin类型:', typeof userInfo.isAdmin)
-          console.log('loadUserInfo - userInfo.isAdmin值:', userInfo.isAdmin)
+          const userInfo = JSON.parse(userStr);
+          console.log('loadUserInfo - 解析后的完整userInfo:', JSON.stringify(userInfo));
+          console.log('loadUserInfo - userInfo.isAdmin类型:', typeof userInfo.isAdmin);
+          console.log('loadUserInfo - userInfo.isAdmin值:', userInfo.isAdmin);
           
           // 确保isAdmin字段存在且为布尔值
           if (userInfo.isAdmin === undefined) {
-            console.log('loadUserInfo - isAdmin为undefined，设置为false')
-            userInfo.isAdmin = false
+            console.log('loadUserInfo - isAdmin为undefined，设置为false');
+            userInfo.isAdmin = false;
           } else if (typeof userInfo.isAdmin !== 'boolean') {
-            console.log('loadUserInfo - isAdmin类型错误，转换为布尔值:', userInfo.isAdmin)
-            userInfo.isAdmin = Boolean(userInfo.isAdmin)
+            console.log('loadUserInfo - isAdmin类型错误，转换为布尔值:', userInfo.isAdmin);
+            userInfo.isAdmin = Boolean(userInfo.isAdmin);
           }
           
-          console.log('loadUserInfo - 处理后isAdmin值:', userInfo.isAdmin)
+          console.log('loadUserInfo - 处理后isAdmin值:', userInfo.isAdmin);
           
           // 保存前最后检查
-          console.log('loadUserInfo - 设置this.userInfo前值:', this.userInfo)
-          this.userInfo = userInfo
-          console.log('loadUserInfo - 设置this.userInfo后值:', this.userInfo)
-          console.log('loadUserInfo - 设置后this.userInfo.isAdmin:', this.userInfo.isAdmin)
+          console.log('loadUserInfo - 设置this.userInfo前值:', this.userInfo);
+          this.userInfo = userInfo;
+          console.log('loadUserInfo - 设置this.userInfo后值:', this.userInfo);
+          console.log('loadUserInfo - 设置后this.userInfo.isAdmin:', this.userInfo.isAdmin);
           
         } catch (e) {
-          console.error('loadUserInfo - 解析失败:', e)
-          console.log('loadUserInfo - 解析失败，设置空对象')
-          this.userInfo = {}
+          console.error('loadUserInfo - 解析失败:', e);
+          console.log('loadUserInfo - 解析失败，设置空对象');
+          this.userInfo = {};
         }
       } else {
-        console.log('loadUserInfo - localStorage.user不存在')
-        this.userInfo = {}
+        console.log('loadUserInfo - localStorage.user不存在');
+        this.userInfo = {};
       }
-      console.log('===== loadUserInfo 结束 ===== 最终userInfo:', JSON.stringify(this.userInfo))
+      console.log('===== loadUserInfo 结束 ===== 最终userInfo:', JSON.stringify(this.userInfo));
     },
     handleStorageChange(event) {
       console.log('===== handleStorageChange 开始 =====')
