@@ -73,14 +73,14 @@ export default {
             console.log('isAdmin字段不存在，设置为false')
             userInfo.isAdmin = false
           }
-          console.log('返回初始化后的用户信息:', userInfo)
+          console.log('初始化后的用户信息:', userInfo)
           return userInfo
         } catch (e) {
           console.error('初始化用户信息失败:', e)
         }
       }
-      console.log('localStorage中没有用户信息，返回null')
-      return null
+      console.log('localStorage中没有用户信息，返回空对象')
+      return {}
     },
     loadUserInfo() {
       console.log('开始加载用户信息...')
