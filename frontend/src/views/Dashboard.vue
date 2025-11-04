@@ -212,32 +212,26 @@ export default {
     loadUserData() {
       // 从localStorage加载用户信息
       const userStr = localStorage.getItem('user')
-      console.log('Dashboard - localStorage.user原始值:', userStr)
       
       if (userStr) {
         try {
           const userInfo = JSON.parse(userStr)
-          console.log('Dashboard - 解析后的userInfo:', JSON.stringify(userInfo))
           
           // 确保isAdmin字段存在且为布尔值
           if (userInfo.isAdmin === undefined) {
-            console.log('Dashboard - isAdmin为undefined，设置为false')
             userInfo.isAdmin = false
           }
           if (typeof userInfo.isAdmin !== 'boolean') {
-            console.log('Dashboard - isAdmin类型错误，转换为布尔值:', userInfo.isAdmin)
             userInfo.isAdmin = Boolean(userInfo.isAdmin)
           }
           
           this.userInfo = userInfo
-          console.log('Dashboard - 处理后userInfo.isAdmin:', this.userInfo.isAdmin)
           
         } catch (e) {
-          console.error('Dashboard - 解析用户信息失败:', e)
+          console.error('解析用户信息失败:', e)
           this.userInfo = {}
         }
       } else {
-        console.log('Dashboard - localStorage.user不存在')
         this.userInfo = {}
       }
     },
