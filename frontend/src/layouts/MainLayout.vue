@@ -100,10 +100,11 @@ export default {
           console.log('loadUserInfo - 更新后的this.userInfo:', this.userInfo)
         } catch (e) {
           console.error('loadUserInfo - 解析用户信息失败:', e)
-          this.userInfo = null
+          this.userInfo = {}
         }
       } else {
         console.log('loadUserInfo - localStorage中没有用户信息')
+        this.userInfo = {}
       }
     },
     handleStorageChange(event) {
