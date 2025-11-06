@@ -34,6 +34,9 @@ public class LifeUserController {
     
     @Resource
     private EmailVerificationService emailVerificationService;
+    
+    @Resource
+    private JwtUtils jwtUtils;
 
     /**
      * 发送邮箱验证码
@@ -77,7 +80,7 @@ public class LifeUserController {
                 LifeUser user = service.findByUsername(qo.getUsername());
                 
                 // 生成JWT token
-                String token = JwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName(), user.getIsAdmin());
+                String token = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName(), user.getIsAdmin());
                 
                 // 构建响应数据，确保isAdmin字段被正确包含
                 Map<String, Object> data = new HashMap<>();
@@ -130,7 +133,7 @@ public class LifeUserController {
         LifeUser user = service.login(loginQo);
         if (user != null) {
             // 生成JWT token
-            String token = JwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName(), user.getIsAdmin());
+            String token = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getFamilyName(), user.getIsAdmin());
             
             // 构建响应数据，确保isAdmin字段被正确包含
             Map<String, Object> data = new HashMap<>();

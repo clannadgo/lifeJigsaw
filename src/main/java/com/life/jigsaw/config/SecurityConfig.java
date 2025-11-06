@@ -64,6 +64,9 @@ public class SecurityConfig {
 
         @Resource
         private LifeUserInterface lifeUserService;
+        
+        @Resource
+        private JwtUtils jwtUtils;
 
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -75,11 +78,11 @@ public class SecurityConfig {
                 String token = authorizationHeader.substring(7);
                 
                 // 验证token
-                if (JwtUtils.validateToken(token)) {
+                if (jwtUtils.validateToken(token)) {
                     try {
                         // 获取token中的用户信息
-                        Long userId = JwtUtils.getUserIdFromToken(token);
-                        Boolean isAdmin = JwtUtils.getIsAdminFromToken(token);
+                        Long userId = jwtUtils.getUserIdFromToken(token);
+                        Boolean isAdmin = jwtUtils.getIsAdminFromToken(token);
                         
                         // 从数据库中获取用户信息
                         LifeUser user = lifeUserService.findById(userId);
