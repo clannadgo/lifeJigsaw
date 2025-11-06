@@ -2,7 +2,6 @@ package com.life.jigsaw.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +25,11 @@ public class JwtUtils {
     
     // 构造函数初始化密钥
     public JwtUtils() {
-        // 使用Keys.secretKeyFor方法生成符合HS512算法要求的安全密钥（至少512位）
-        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        // 使用Keys.hmacShaKeyFor方法生成HMAC-SHA密钥，这是现代API推荐的方式
+        // 生成一个随机的64字节(512位)密钥，足够安全且符合HS512算法要求
+        byte[] keyBytes = new byte[64];
+        new java.security.SecureRandom().nextBytes(keyBytes);
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
     
     /**
