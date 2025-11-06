@@ -19,10 +19,16 @@ import java.util.Map;
 public class JwtUtils {
 
     // JWT过期时间（24小时）
-    private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000;
+    private final long expireTime = 24 * 60 * 60 * 1000;
     
-    // 使用Keys.secretKeyFor方法生成符合HS512算法要求的安全密钥（至少512位）
-    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    // 密钥实例变量
+    private final SecretKey secretKey;
+    
+    // 构造函数初始化密钥
+    public JwtUtils() {
+        // 使用Keys.secretKeyFor方法生成符合HS512算法要求的安全密钥（至少512位）
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    }
     
     /**
      * 生成JWT token
@@ -32,7 +38,7 @@ public class JwtUtils {
      * @param isAdmin 是否为管理员
      * @return JWT token
      */
-    public static String generateToken(Long userId, String username, String familyName, Boolean isAdmin) {
+    public String generateToken(Long userId, String username, String familyName, Boolean isAdmin) {
         // 创建JWT声明
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
@@ -42,15 +48,17 @@ public class JwtUtils {
         
         // 生成JWT token
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + EXPIRE_TIME);
-        
-        // 直接使用预先生成的安全密钥
+        Date expireDate = new Date(now.getTime() + expireTime);
         
         return Jwts.builder()
-                .setClaims(claims)
+                // Using individual claim methods instead of setClaims
+                .claim("userId", userId)
+                .claim("username", username)
+                .claim("familyName", familyName)
+                .claim("isAdmin", isAdmin != null ? isAdmin : false)
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
-                .signWith(SECRET_KEY, SignatureAlgorithm.HS512)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
     
@@ -59,10 +67,9 @@ public class JwtUtils {
      * @param token JWT token
      * @return 解析后的声明
      */
-    public static Claims parseToken(String token) {
-        // 直接使用预先生成的安全密钥
+    public Claims parseToken(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -73,7 +80,7 @@ public class JwtUtils {
      * @param token JWT token
      * @return 是否有效
      */
-    public static boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
             Claims claims = parseToken(token);
             return claims.getExpiration().after(new Date());
@@ -87,7 +94,7 @@ public class JwtUtils {
      * @param token JWT token
      * @return 用户名
      */
-    public static String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.get("username", String.class);
     }
@@ -97,7 +104,7 @@ public class JwtUtils {
      * @param token JWT token
      * @return 用户ID
      */
-    public static Long getUserIdFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.get("userId", Long.class);
     }
@@ -107,7 +114,7 @@ public class JwtUtils {
      * @param token JWT token
      * @return 家庭名称
      */
-    public static String getFamilyNameFromToken(String token) {
+    public String getFamilyNameFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.get("familyName", String.class);
     }
@@ -117,7 +124,7 @@ public class JwtUtils {
      * @param token JWT token
      * @return 是否为管理员
      */
-    public static Boolean getIsAdminFromToken(String token) {
+    public Boolean getIsAdminFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.get("isAdmin", Boolean.class) != null ? claims.get("isAdmin", Boolean.class) : false;
     }
