@@ -51,14 +51,14 @@ public class JwtUtils {
         Date expireDate = new Date(now.getTime() + expireTime);
         
         return Jwts.builder()
-                // Using individual claim methods instead of setClaims
+                // Using individual claim methods instead of setClaims and deprecated methods
                 .claim("userId", userId)
                 .claim("username", username)
                 .claim("familyName", familyName)
                 .claim("isAdmin", isAdmin != null ? isAdmin : false)
-                .setIssuedAt(now)
-                .setExpiration(expireDate)
-                .signWith(secretKey, SignatureAlgorithm.HS512)
+                .claim("iat", now) // Issued at time
+                .claim("exp", expireDate) // Expiration time
+                .signWith(secretKey)
                 .compact();
     }
     
@@ -69,7 +69,8 @@ public class JwtUtils {
      */
     public Claims parseToken(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                // Using the modern method to set signing key
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
